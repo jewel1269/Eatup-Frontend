@@ -3,7 +3,7 @@ import { View, StyleSheet, Text, Image, ToastAndroid } from 'react-native';
 import { TextInput, Button } from 'react-native-paper';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/components/AllComponent/Firebase/Firebase';
 
 const SignUpScreen = () => {
@@ -51,15 +51,17 @@ const SignUpScreen = () => {
   };
 
   // Handle form submission
-  const handleLogin = () => {
+  const handleSignUp = () => {
     if (validateForm()) {
-      signInWithEmailAndPassword(auth, email, password)
+      createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
           const user = userCredential.user;
-          ToastAndroid.show("Successfully Logged In", ToastAndroid.SHORT); 
+          ToastAndroid.show("Successfully Registred", ToastAndroid.SHORT); 
           console.log('User logged in:', user);
+          router.replace("/signIn")
 
         })
+
         .catch((error) => {
           console.error('Login error:', error.message);
           ToastAndroid.show(`Login failed: ${error.message}`, ToastAndroid.SHORT); 
@@ -107,7 +109,7 @@ const SignUpScreen = () => {
 
         <Text style={styles.forgotPassword}>Forgot Password?</Text>
 
-        <Button mode="contained" onPress={handleLogin} style={styles.loginButton}>
+        <Button mode="contained" onPress={handleSignUp} style={styles.loginButton}>
           Sign Up
         </Button>
       </View>

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Text, Image } from 'react-native';
+import { View, StyleSheet, Text, Image, ToastAndroid } from 'react-native';
 import { TextInput, Button } from 'react-native-paper';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '@/components/AllComponent/Firebase/Firebase';
 
 const SignInScreen = () => {
   const [email, setEmail] = useState('');
@@ -15,7 +17,7 @@ const SignInScreen = () => {
   const LogUp = () =>{
     router.replace("/signUp")
   }
-
+  const move = "/(tabs)/home.tsx"
   // Email validation regex
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -49,10 +51,22 @@ const SignInScreen = () => {
   };
 
   // Handle form submission
-  const handleLogin = () => {
+   // Handle form submission
+   const handleLogin = () => {
     if (validateForm()) {
-      console.log({ email, password });
-      // Proceed with login logic here
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          ToastAndroid.show("Successfully Login", ToastAndroid.SHORT); 
+          console.log('User logged in:', user);
+          router.push("/(tabs)")
+
+        })
+
+        .catch((error) => {
+          console.error('Login error:', error.message);
+          ToastAndroid.show(`Login failed: ${error.message}`, ToastAndroid.SHORT); 
+        });
     }
   };
 
