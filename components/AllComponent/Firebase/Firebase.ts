@@ -6,12 +6,12 @@ import { getAuth } from "firebase/auth";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyA6lyB4IzjKGKJ5aegP5R8k2cESOrTO_VA",
-  authDomain: "jesha-app.firebaseapp.com",
-  projectId: "jesha-app",
-  storageBucket: "jesha-app.appspot.com",
-  messagingSenderId: "988635790935",
-  appId: "1:988635790935:web:56e08c6a64f175ac84ed12",
+  apiKey: "AIzaSyCQIN2lFR42Nv9d6MnGBk6bpUUgm3dj9BE",
+  authDomain: "eatup-784b8.firebaseapp.com",
+  projectId: "eatup-784b8",
+  storageBucket: "eatup-784b8.appspot.com",
+  messagingSenderId: "117604136429",
+  appId: "1:117604136429:web:210d0111067c1e2f5023e4"
 };
 
 // Initialize Firebase
