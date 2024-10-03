@@ -7,6 +7,7 @@ import BurgerList from "@/components/AllComponent/BurgerList/BurgerList";
 import PopularItem from "@/components/AllComponent/PopularItem/PopularItem";
 
 export default function HomeScreen() {
+  
   return (
     <View style={styles.container}>
       {/* Header section */}
@@ -101,7 +102,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   contentPlaceholderBurger: {
-    height: 245,
+    height: 255,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "white",

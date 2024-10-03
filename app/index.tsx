@@ -1,17 +1,27 @@
 // Import libraries
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import LottieView from 'lottie-react-native'; 
-
-// Create a component
+import useAuth from '@/components/AllComponent/useAuth/useAuth'; 
+// Create the component
 const Index = () => {
   const router = useRouter();
   const scaleValue = useRef(new Animated.Value(1)).current; 
   const [loading, setLoading] = useState(true); 
 
+  const { user } = useAuth(); 
+  console.log(user, "hello user");
+
+  // If the user is authenticated, redirect to home page
+  useEffect(() => {
+    if (user) {
+      router.replace('/(tabs)/home');  
+    }
+  }, [user]);
+
   const getStart = () => {
-    router.replace("/signUp");
+    router.replace('/signUp');  
   };
 
   useEffect(() => {
@@ -31,9 +41,10 @@ const Index = () => {
       }).start();
     });
 
-    // Clean up the timer
-    return () => clearTimeout(timer);
+    return () => clearTimeout(timer); 
   }, [scaleValue]);
+
+  if (user) return null; 
 
   return (
     <View style={styles.container}>
@@ -57,7 +68,7 @@ const Index = () => {
   );
 };
 
-// Define your styles
+// Define styles
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#ff5757",

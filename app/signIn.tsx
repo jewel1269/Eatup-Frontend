@@ -17,7 +17,7 @@ const SignInScreen = () => {
   const LogUp = () =>{
     router.replace("/signUp")
   }
-  const move = "/(tabs)/home.tsx"
+
   // Email validation regex
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -59,7 +59,7 @@ const SignInScreen = () => {
           const user = userCredential.user;
           ToastAndroid.show("Successfully Login", ToastAndroid.SHORT); 
           console.log('User logged in:', user);
-          router.push("/(tabs)")
+          router.replace("/(tabs)/home")
 
         })
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
+import { Link, useRouter } from 'expo-router';
 
 const data = [
   {
@@ -76,9 +77,12 @@ const data = [
 ];
 
 const BurgerCard = ({ item }:any) => {
+
+
   return (
    <View style={styles.container}>
-     <View style={styles.card}>
+     <Link href={`/details/${item.id}`}>
+     <View  style={styles.card}>
       <View style={styles.rating}>
         <AntDesign name="star" size={16} color="orange" />
         <Text style={styles.ratingText}>{item.rating}</Text>
@@ -91,6 +95,8 @@ const BurgerCard = ({ item }:any) => {
         <AntDesign name="plus" size={16} color="white" />
       </TouchableOpacity>
     </View>
+     
+     </Link>
    </View>
   );
 };
@@ -116,6 +122,7 @@ const styles = StyleSheet.create({
   listContainer: {
     paddingHorizontal: 20,
     flexDirection: 'row',
+    gap:5
   },
   card: {
     backgroundColor: 'white',
