@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
         padding: 10,
         borderRadius: 10,
         marginHorizontal: 5,
-        height: 50,
+        height: 40,
 
     },
     image: {
@@ -64,7 +64,6 @@ const styles = StyleSheet.create({
     },
     text: {
         color: '#fff',
-        marginTop: 5,
         textAlign: 'center', 
     },
 });

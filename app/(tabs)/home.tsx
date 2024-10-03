@@ -1,4 +1,4 @@
-import { View, Text, ActivityIndicator, StyleSheet, Image } from "react-native";
+import { View, Text, ActivityIndicator, StyleSheet, Image, ScrollView } from "react-native";
 import { Entypo, FontAwesome5 } from "@expo/vector-icons";
 import Search from "@/components/AllComponent/Search/Search";
 import HeroSlider from "@/components/AllComponent/HeroSection/HeroSection";
@@ -9,6 +9,7 @@ import PopularItem from "@/components/AllComponent/PopularItem/PopularItem";
 export default function HomeScreen() {
   return (
     <View style={styles.container}>
+      {/* Header section */}
       <View style={styles.header}>
         <View style={styles.iconContainer}>
           <FontAwesome5 name="bars" size={24} color="black" />
@@ -32,25 +33,24 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* Placeholder views for additional content */}
-      <View style={styles.contentPlaceholder}>
-        <Search />
-      </View>
-      <View style={styles.contentPlaceholderTow}>
-        <HeroSlider />
-      </View>
-      <View style={styles.contentPlaceholder}>
-        <Category />
-      </View>
-      {/* Default Iten */}
-      <View style={styles.contentPlaceholderBurger}>
-        <BurgerList />
-      </View>
-
-      {/* Popular Item */}
-      <View style={styles.popularItem}>
-        <PopularItem/>
-      </View>
+      {/* Scrollable content */}
+      <ScrollView>
+        <View style={styles.contentPlaceholder}>
+          <Search />
+        </View>
+        <View style={styles.contentPlaceholderTow}>
+          <HeroSlider />
+        </View>
+        <View style={styles.contentPlaceholder}>
+          <Category />
+        </View>
+        <View style={styles.contentPlaceholderBurger}>
+          <BurgerList />
+        </View>
+        <View style={styles.popularItem}>
+          <PopularItem />
+        </View>
+      </ScrollView>
     </View>
   );
 }
@@ -58,6 +58,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "white",
+    flex: 1,
   },
   header: {
     flexDirection: "row",
@@ -104,10 +105,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "white",
-   
   },
-  popularItem:{
-    paddingHorizontal:20,
-    marginTop:14
-  }
+  popularItem: {
+    paddingHorizontal: 20,
+    marginTop: 14,
+    height: "auto",
+  },
 });
