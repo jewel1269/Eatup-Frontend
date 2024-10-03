@@ -3,8 +3,12 @@ import { View, StyleSheet, Text, Image, ToastAndroid } from 'react-native';
 import { TextInput, Button } from 'react-native-paper';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { auth } from '@/components/AllComponent/Firebase/Firebase';
+
+
+// google provider
+const provider = new GoogleAuthProvider();
 
 const SignInScreen = () => {
   const [email, setEmail] = useState('');
@@ -50,7 +54,7 @@ const SignInScreen = () => {
     return isValid;
   };
 
-  // Handle form submission
+
    // Handle form submission
    const handleLogin = () => {
     if (validateForm()) {
@@ -70,6 +74,24 @@ const SignInScreen = () => {
     }
   };
 
+  // Google Login
+  const handleGoogleLogin = async () => {
+    const router = useRouter(); 
+  
+    try {
+      const provider = new GoogleAuthProvider(); 
+      const userCredential = await signInWithPopup(auth, provider);
+      const user = userCredential.user;
+  
+      ToastAndroid.show("Successfully logged in", ToastAndroid.SHORT);
+      console.log('User logged in:', user);
+  
+      router.replace("/(tabs)/home");
+    } catch (error) {
+      console.error('Login error:');
+      ToastAndroid.show(`Login failed`, ToastAndroid.SHORT);
+    }
+  };
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>
@@ -121,7 +143,7 @@ const SignInScreen = () => {
       <View style={styles.socialIcons}>
         <FontAwesome name="facebook" size={30} color="#3b5998" style={styles.icon} />
         <FontAwesome name="twitter" size={30} color="#00acee" style={styles.icon} />
-        <FontAwesome name="google" size={30} color="#db4437" style={styles.icon} />
+        <FontAwesome onPress={handleGoogleLogin} name="google" size={30} color="#db4437" style={styles.icon} />
       </View>
     </View>
   );

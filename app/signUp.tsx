@@ -7,6 +7,7 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'fire
 import { auth } from '@/components/AllComponent/Firebase/Firebase';
 
 const SignUpScreen = () => {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -84,6 +85,16 @@ const SignUpScreen = () => {
       <Text style={styles.subtitle}>Please login to continue using our app</Text>
 
       <View>
+      <TextInput
+          mode="outlined"
+          label="Name"
+          value={name}
+          onChangeText={(text) => setName(text)}
+          style={styles.input} 
+          error={!!emailError}
+          theme={{ roundness: 15 }} 
+        />
+        {emailError ? <Text style={styles.error}>{emailError}</Text> : null}
         <TextInput
           mode="outlined"
           label="Email"

@@ -7,7 +7,7 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const activeTintColor = Colors[colorScheme ?? 'light'].tint;
-  const inactiveTintColor = '#8e8e93'; // Soft gray for inactive tabs
+  const inactiveTintColor = 'red'; 
 
   return (
     <Tabs
@@ -15,17 +15,17 @@ export default function TabLayout() {
         tabBarActiveTintColor: activeTintColor,
         tabBarInactiveTintColor: inactiveTintColor,
         tabBarStyle: {
-          backgroundColor: colorScheme === 'dark' ? '#1c1c1e' : '#ffffff', // Dark mode and light mode background
-          borderTopWidth: 0, // Remove top border
-          height: 60, // Increase tab bar height
-          paddingBottom: 10, // Add padding for better spacing
+          backgroundColor: colorScheme === 'dark' ? '#1c1c1e' : '#ffffff', 
+          borderTopWidth: 0, 
+          height: 60, 
+          paddingBottom: 10,
         },
         headerShown: false,
         tabBarLabelStyle: {
-          fontSize: 12, // Smaller font size for a sleeker look
+          fontSize: 12, 
         },
         tabBarIconStyle: {
-          marginBottom: 5, // Space between icon and label
+          marginBottom: 5, 
         },
       }}
     >
@@ -62,11 +62,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="setting"
         options={{
-          title: 'Profile',
+          title: 'Settings',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'person' : 'person-outline'} color={"red"} size={28} />
+            <TabBarIcon name={focused ? 'settings' : 'settings-outline'} color={"red"} size={28} />
           ),
         }}
       />
