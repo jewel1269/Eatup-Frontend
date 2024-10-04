@@ -27,6 +27,10 @@ const SettingsScreen = ({ navigation }: any) => {
     router.push("/profile");
   };
 
+  const handleBack = () => {
+    router.back();
+  };
+
   // Handle search icon click
   const toggleSearch = () => {
     setIsSearching(!isSearching);
@@ -70,7 +74,7 @@ const SettingsScreen = ({ navigation }: any) => {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={handleBack}>
           <Ionicons name="arrow-back-outline" size={24} color="black" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Settings</Text>
@@ -134,7 +138,7 @@ const SettingsScreen = ({ navigation }: any) => {
                 borderRadius:20,
                 width:120,
             }}>
-            <Button onPress={confirmLogOut} color={"red"}  title="Log Out"/>
+            <Button onPress={confirmLogOut} color={"#ff4d4d"}  title="Log Out"/>
             </View>
         </TouchableOpacity>
       </ScrollView>

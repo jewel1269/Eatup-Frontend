@@ -13,6 +13,10 @@ export default function ProfileScreen() {
 const handleBack =()=>{
     router.back()
 }
+// update profile
+const goUpdateProfile = ()=>{
+  router.replace("/updateProfile")
+}
 
 // Logut function
 const handleLogOut = () => {
@@ -99,7 +103,7 @@ const handleLogOut = () => {
       </View>
 
       {/* Edit Button */}
-      <TouchableOpacity style={styles.editButton}>
+      <TouchableOpacity onPress={goUpdateProfile}  style={styles.editButton}>
         <Text style={styles.editButtonText}>Edit</Text>
       </TouchableOpacity>
     </View>
@@ -177,8 +181,10 @@ const styles = StyleSheet.create({
   },
   editButton: {
     backgroundColor: '#ff4d4d',
-    padding: 15,
-    borderRadius: 10,
+    padding: 6,
+    width:"50%",
+    alignSelf:"center",
+    borderRadius: 15,
     alignItems: 'center',
     marginTop: 30,
   },
