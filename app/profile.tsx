@@ -1,37 +1,39 @@
 import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, Switch, TouchableOpacity, TextInput, ToastAndroid } from 'react-native';
+import { View, Text, Image, StyleSheet, Switch, TouchableOpacity, TextInput, ToastAndroid, ScrollView, Dimensions } from 'react-native';
 import { AntDesign, FontAwesome } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/components/AllComponent/Firebase/Firebase';
 
+const { width } = Dimensions.get('window'); // Get device width
+
 export default function ProfileScreen() {
   const [isUSCitizen, setIsUSCitizen] = useState(false);
 
   const toggleSwitch = () => setIsUSCitizen(previousState => !previousState);
-//   back to home page
-const handleBack =()=>{
-    router.back()
-}
-// update profile
-const goUpdateProfile = ()=>{
-  router.replace("/updateProfile")
-}
 
-// Logut function
-const handleLogOut = () => {
-  signOut(auth)
-    .then(() => {
-      ToastAndroid.show("Successfully logged out", ToastAndroid.SHORT);
-      router.replace("/signIn")
-    })
-    .catch((error) => {
-      console.error('Logout error:', error.message);
-      ToastAndroid.show(`Logout failed: ${error.message}`, ToastAndroid.SHORT);
-    });
-};
+  const handleBack = () => {
+    router.back();
+  };
+
+  const goUpdateProfile = () => {
+    router.replace("/updateProfile");
+  };
+
+  const handleLogOut = () => {
+    signOut(auth)
+      .then(() => {
+        ToastAndroid.show("Successfully logged out", ToastAndroid.SHORT);
+        router.replace("/signIn");
+      })
+      .catch((error) => {
+        console.error('Logout error:', error.message);
+        ToastAndroid.show(`Logout failed: ${error.message}`, ToastAndroid.SHORT);
+      });
+  };
+
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBack}>
@@ -39,7 +41,7 @@ const handleLogOut = () => {
         </TouchableOpacity>
         <Text style={styles.headerText}>Profile</Text>
         <TouchableOpacity onPress={handleLogOut}>
-        <AntDesign  name="logout" size={24} color="red" />
+          <AntDesign name="logout" size={24} color="red" />
         </TouchableOpacity>
       </View>
 
@@ -103,10 +105,10 @@ const handleLogOut = () => {
       </View>
 
       {/* Edit Button */}
-      <TouchableOpacity onPress={goUpdateProfile}  style={styles.editButton}>
+      <TouchableOpacity onPress={goUpdateProfile} style={styles.editButton}>
         <Text style={styles.editButtonText}>Edit</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -132,22 +134,22 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   profilePic: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: width * 0.25, // 25% of screen width
+    height: width * 0.25, // 25% of screen width
+    borderRadius: (width * 0.25) / 2, // Circular profile picture
     borderWidth: 3,
     borderColor: 'white',
   },
   editIcon: {
     position: 'absolute',
     bottom: 0,
-    right: 130,
+    right: '30%', // Relative positioning for better responsiveness
     backgroundColor: 'red',
     borderRadius: 60,
     padding: 5,
   },
   infoSection: {
-    marginTop: 30,
+    marginTop: 10,
     backgroundColor: '#f9f9f9',
     padding: 15,
     borderRadius: 10,
@@ -177,13 +179,13 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 8,
     backgroundColor: '#f1f1f1',
-    width: '60%',
+    width: '60%', // Responsive width
   },
   editButton: {
     backgroundColor: '#ff4d4d',
     padding: 6,
-    width:"50%",
-    alignSelf:"center",
+    width: "50%",
+    alignSelf: "center",
     borderRadius: 15,
     alignItems: 'center',
     marginTop: 30,

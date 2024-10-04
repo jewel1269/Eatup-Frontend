@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import Modal from "react-native-modal";
 import { CheckBox } from "react-native-elements";
+import MenuMeal from "../MenuMeal/MenuMeal";
 
 const FilterModal = () => {
   const [isModalVisible, setModalVisible] = useState(false);
@@ -24,18 +25,17 @@ const FilterModal = () => {
   const [location, setLocation] = useState("Uttara-10, Dhaka, BD");
   const [status, setStatus] = useState<any>({
     Burger: true,
-    Sanwich: false,
+    Sandwich: false,
     Pizza: true,
     Fruits: false,
-    Chiken: false,
+    Chicken: false,
     Medicine: false,
   });
 
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const handleSearch = (query:any) => {
+  const handleSearch = (query: string) => {
     setSearchQuery(query);
- 
   };
 
   const toggleModal = () => {
@@ -57,155 +57,161 @@ const FilterModal = () => {
 
   return (
     <View>
-         <View style={{
-            flexDirection:"row",
-            justifyContent:"space-between",
-            alignItems:"center",
-            paddingHorizontal:10,
-            marginTop:4
-         }}>
-            <Image style={{
-                height:50,
-                width:80,
-                marginLeft:-5,
-                marginTop:5
-            }} source={require('../../../assets/images/Logo/logo1.png-removebg-preview.png')}/>
-            <Text style={{fontSize:20, fontWeight:"bold", marginTop:6}}>Meal Menu </Text>
-            <View style={{
-                backgroundColor: "green",
-                padding:8,
-                borderRadius:10
-            }}>
-                <TouchableOpacity>
-                    <Text style={{color:"white"}} onPress={toggleModal} >
-                      Filter
-                    </Text>
-                </TouchableOpacity>
-            
-            </View>
-         </View>
+      <View>
+        {/* Header with Logo and Filter Button */}
+        <View style={styles.headerContainer}>
+          <Image
+            style={styles.logo}
+            source={require("../../../assets/images/Logo/logo1.png-removebg-preview.png")}
+          />
+          <Text style={styles.headerText}>Meal Menu</Text>
+          <View style={styles.filterButtonContainer}>
+            <TouchableOpacity onPress={toggleModal}>
+              <Text style={styles.filterButtonText}>Filter</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
 
-      <View style={styles.searchContainer}>
-      <TextInput
-        style={styles.input}
-        placeholder="Search..."
-        value={searchQuery}
-        onChangeText={handleSearch}
-      />
-    </View>
+        {/* Search Input */}
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Search..."
+            value={searchQuery}
+            onChangeText={handleSearch}
+          />
+        </View>
 
-      <ScrollView>
-        <View style={styles.container}>
-          <Modal
-            isVisible={isModalVisible}
-            onBackdropPress={toggleModal}
-            style={styles.modal}
-            swipeDirection={["down"]}
-            onSwipeComplete={toggleModal}
-            backdropOpacity={0.5}
-          >
-            <View style={styles.modalContent}>
-              <Text style={styles.header}>Filter</Text>
+        {/* Filter Modal */}
+        <Modal
+          isVisible={isModalVisible}
+          onBackdropPress={toggleModal}
+          style={styles.modal}
+          swipeDirection={["down"]}
+          onSwipeComplete={toggleModal}
+          backdropOpacity={0.5}
+        >
+          <View style={styles.modalContent}>
+            <Text style={styles.modalHeader}>Filter</Text>
 
-              <View style={styles.filterSection}>
-                <Text>Choose Meal</Text>
-                <View style={styles.checkboxContainer}>
-                  <CheckBox
-                    title="Breackfast"
-                    checked={mechanical}
-                    onPress={() => setMechanical(!mechanical)}
-                  />
-                  <CheckBox
-                    title="Lunch"
-                    checked={structure}
-                    onPress={() => setStructure(!structure)}
-                  />
-                  <CheckBox
-                    title="Dinner"
-                    checked={equipment}
-                    onPress={() => setEquipment(!equipment)}
-                  />
-                  <CheckBox
-                    title="Special Offer"
-                    checked={electric}
-                    onPress={() => setElectric(!electric)}
-                  />
-                </View>
-              </View>
-
-              <View style={{
-                flexDirection:"row",
-                alignItems:"center",
-                justifyContent:"space-between",
-                marginBottom: 10
-              }}>
-                <Text style={{fontSize:18, fontWeight:"bold"}}>Show my work orders</Text>
-                <Switch
-                  value={showFavorites}
-                  onValueChange={() => setShowFavorites(!showFavorites)}
+            {/* Meal Type Checkboxes */}
+        <ScrollView>
+        <View style={styles.filterSection}>
+              <Text>Choose Meal</Text>
+              <View style={styles.checkboxContainer}>
+                <CheckBox
+                  title="Breakfast"
+                  checked={mechanical}
+                  onPress={() => setMechanical(!mechanical)}
+                />
+                <CheckBox
+                  title="Lunch"
+                  checked={structure}
+                  onPress={() => setStructure(!structure)}
+                />
+                <CheckBox
+                  title="Dinner"
+                  checked={equipment}
+                  onPress={() => setEquipment(!equipment)}
+                />
+                <CheckBox
+                  title="Special Offer"
+                  checked={electric}
+                  onPress={() => setElectric(!electric)}
                 />
               </View>
-
-              <View style={styles.filterSection}>
-                <Text style={{fontWeight:"bold"}}>Priority</Text>
-                <View style={styles.priorityContainer}>
-                  {["High Price", "Medium Price", "Low Price"].map((level) => (
-                    <TouchableOpacity
-                      key={level}
-                      onPress={() => setPriority(level)}
-                    >
-                      <Text
-                        style={
-                          priority === level
-                            ? styles.selectedPriority
-                            : styles.priority
-                        }
-                      >
-                        {level}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-
-              <View style={styles.filterSection}>
-                <Text style={{fontWeight:"bold"}}>Location</Text>
-                <Text>{location}</Text>
-              </View>
-
-              <View style={styles.filterSection}>
-                <Text>Status</Text>
-                {renderStatusOptions()}
-              </View>
-
-              <Button title="Show Results" onPress={toggleModal} />
             </View>
-          </Modal>
-        </View>
-      </ScrollView>
 
+            {/* Show Favorites Toggle */}
+            <View style={styles.toggleContainer}>
+              <Text style={styles.toggleText}>Show my favorite orders</Text>
+              <Switch
+                value={showFavorites}
+                onValueChange={() => setShowFavorites(!showFavorites)}
+              />
+            </View>
 
-      <View>
-        <Text>
-            Hello Bhai
-        </Text>
+            {/* Price Priority */}
+            <View style={styles.filterSection}>
+              <Text style={styles.sectionTitle}>Priority</Text>
+              <View style={styles.priorityContainer}>
+                {["High Price", "Medium Price", "Low Price"].map((level) => (
+                  <TouchableOpacity
+                    key={level}
+                    onPress={() => setPriority(level)}
+                  >
+                    <Text
+                      style={
+                        priority === level
+                          ? styles.selectedPriority
+                          : styles.priority
+                      }
+                    >
+                      {level}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            {/* Location */}
+            <View style={styles.filterSection}>
+              <Text style={styles.sectionTitle}>Location</Text>
+              <Text>{location}</Text>
+            </View>
+
+            {/* Status Checkboxes */}
+            <View style={styles.filterSection}>
+              <Text>Status</Text>
+              {renderStatusOptions()}
+            </View>
+
+        </ScrollView>
+            <Button title="Show Results" onPress={toggleModal} />
+          </View>
+        </Modal>
+
+        {/* MenuMeal Component */}
+        <ScrollView>
+          <MenuMeal />
+        </ScrollView>
       </View>
+      <Text>Hello</Text>
     </View>
   );
 };
 
+// Styles
 const styles = StyleSheet.create({
-  container: {
-    justifyContent: "center",
+  headerContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 20,
-    marginTop: 50,
+    marginTop: 4,
   },
-  modal: {
-    justifyContent: "flex-end",
-    margin: 0,
+  logo: {
+    height: 50,
+    width: 80,
+    marginLeft: -5,
+    marginTop: 5,
   },
+  headerText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginTop: 6,
+  },
+  filterButtonContainer: {
+    backgroundColor: "green",
+    padding: 8,
+    borderRadius: 10,
+  },
+  filterButtonText: {
+    color: "white",
+  },
+  sectionTitle: {},
   searchContainer: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
     borderRadius: 10,
     padding: 10,
     margin: 10,
@@ -213,16 +219,21 @@ const styles = StyleSheet.create({
   input: {
     height: 40,
     paddingLeft: 10,
-    backgroundColor: '#fff', 
+    backgroundColor: "#fff",
     borderRadius: 10,
+  },
+  modal: {
+    justifyContent: "flex-end",
+    margin: 0,
   },
   modalContent: {
     backgroundColor: "white",
     padding: 20,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+    height: "80%", // Make the modal cover half the screen
   },
-  header: {
+  modalHeader: {
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 10,
@@ -234,9 +245,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
   },
+  toggleContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+  toggleText: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
   priorityContainer: {
     flexDirection: "row",
-    marginLeft:-10
+    marginLeft: -10,
   },
   priority: {
     marginHorizontal: 10,

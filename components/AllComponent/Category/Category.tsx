@@ -23,7 +23,7 @@ const Category = () => {
                 {categories.map((category:any, index:any) => (
                     <TouchableOpacity 
                         key={index} 
-                        style={[styles.item, { backgroundColor: selectedIndex === index ? 'green' : 'red' }]} 
+                        style={[styles.item, { backgroundColor: selectedIndex === index ? 'green' : 'white' }]} 
                         onPress={() => setSelectedIndex(index)}
                     >
                         <Image source={category.image} style={styles.image} />
@@ -55,6 +55,8 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         marginHorizontal: 5,
         height: 40,
+        borderWidth:1,
+        borderColor:"black"
 
     },
     image: {
@@ -63,7 +65,7 @@ const styles = StyleSheet.create({
         resizeMode: 'contain', 
     },
     text: {
-        color: '#fff',
+        color: 'black',
         textAlign: 'center', 
     },
 });

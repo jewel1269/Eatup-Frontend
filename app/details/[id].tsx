@@ -144,9 +144,11 @@ const DetailsPage = () => {
           </View>
         </View>
 
-        <Text style={styles.descriptionText}>
+       <ScrollView>
+       <Text style={styles.descriptionText}>
           {product.description}
         </Text>
+       </ScrollView>
 
         <Text style={styles.ingredients}>• {product.category}</Text>
       </View>
