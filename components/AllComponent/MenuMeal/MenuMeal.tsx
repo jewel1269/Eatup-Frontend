@@ -1,242 +1,205 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
+import React from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+} from "react-native";
+import { AntDesign } from "@expo/vector-icons";
+import { Link, useRouter } from "expo-router";
 
-const initialProducts = [
+const data = [
   {
     id: 1,
-    name: 'Washington Apples',
-    image: 'https://images.immediate.co.uk/production/volatile/sites/30/2013/05/spaghetti-carbonara-382837d.jpg?resize=768,574',
-    type: 'Premium',
-    storageLife: '3 Days',
-    discount: '25%',
-    price: 128,
-    discountedPrice: 90.40,
-    quantity: 3,
-    inStock: true,
+    title: "Chicken Burger",
+    description: "100 gr chicken + tomato + cheese + lettuce",
+    price: 20.0,
+    rating: 3.8,
+    totalOrder: 120,
+    category: "burger",
+    image:
+      "https://t4.ftcdn.net/jpg/01/77/76/01/360_F_177760171_8bck7cs3r3oyIC2wrEg0guh6Fdull82k.jpg",
   },
   {
     id: 2,
-    name: 'Kinwow',
-    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRqT9pgwDXChFqhZoKeR_uEPKt5tVZ8h6jmmH26XerUA1LaFi5ZzBO_yRBU0fgrLrFm8eA&usqp=CAU',
-    type: 'Regular',
-    storageLife: '5 Days',
-    discount: '15%',
-    price: 58,
-    discountedPrice: 44,
-    quantity: 1,
-    inStock: true,
+    title: "Cheese Burger",
+    description: "100 gr meat + onion + tomato + lettuce cheese",
+    price: 15.0,
+    rating: 4.5,
+    totalOrder: 200,
+    category: "burger",
+    image:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Cheeseburger.jpg/1200px-Cheeseburger.jpg",
   },
   {
     id: 3,
-    name: 'Mushrooms - Button',
-    image: 'https://via.placeholder.com/50',
-    type: 'Premium',
-    storageLife: '2 Days',
-    discount: '20%',
-    price: 57,
-    discountedPrice: 45.60,
-    quantity: 1,
-    inStock: false,
+    title: "Veggie Burger",
+    description: "100 gr veggie patty + lettuce + tomato",
+    price: 12.0,
+    rating: 4.2,
+    totalOrder: 150,
+    category: "burger",
+    image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcpcaXrOe36ZzjBhvgPTkqLh2us1Rj9MwIUZznnSW81T1W51WqN0dE7bBYOkryIdCYd0o&usqp=CAU",
   },
   {
     id: 4,
-    name: 'Onion',
-    image: 'https://via.placeholder.com/50',
-    type: 'Regular',
-    storageLife: '2 Weeks',
-    discount: '40%',
-    price: 32,
-    discountedPrice: 20,
-    quantity: 1,
-    inStock: true,
+    title: "Fish Burger",
+    description: "100 gr fish + lettuce + tartar sauce",
+    price: 18.0,
+    rating: 4.3,
+    totalOrder: 180,
+    category: "burger",
+    image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1WGXa2HYF4kI4efT_nIE8K5x6As9xElf0KkqNbWB4drzq1UKFshsbqwU9djaFkis1iIU&usqp=CAU",
   },
   {
     id: 5,
-    name: 'Garlic',
-    image: 'https://via.placeholder.com/50',
-    type: 'Regular',
-    storageLife: '2 Weeks',
-    discount: '30%',
-    price: 60,
-    discountedPrice: 42,
-    quantity: 1,
-    inStock: true,
+    title: "Spicy Burger",
+    description: "100 gr beef + jalapeno + cheese",
+    price: 22.0,
+    rating: 4.8,
+    totalOrder: 220,
+    category: "burger",
+    image:
+      "https://www.shutterstock.com/image-photo/closeup-front-view-fresh-tasty-600nw-2476315587.jpg",
   },
   {
     id: 6,
-    name: 'Tomato',
-    image: 'https://via.placeholder.com/50',
-    type: 'Premium',
-    storageLife: '5 Days',
-    discount: '10%',
-    price: 45,
-    discountedPrice: 40.50,
-    quantity: 1,
-    inStock: true,
+    title: "BBQ Burger",
+    description: "100 gr beef + BBQ sauce + onions",
+    price: 19.0,
+    rating: 4.6,
+    totalOrder: 190,
+    category: "burger",
+    image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZuAq1ZTIafzokwGKcz2y8S9rd5CgnacD9Ujm4bkxPSvTAd4w9qQKzkgJXvhpkhlcQ-VQ&usqp=CAU",
+  },
+  {
+    id: 7,
+    title: "Double Burger",
+    description: "200 gr beef + double cheese + lettuce",
+    price: 25.0,
+    rating: 4.9,
+    totalOrder: 250,
+    category: "burger",
+    image:
+      "https://img.freepik.com/photos-premium/hamburger-laitue-tomate-du-fromage_62972-1595.jpg?w=360",
+  },
+  {
+    id: 8,
+    title: "Chiken",
+    description: "200 gr beef + double cheese + lettuce",
+    price: 25.0,
+    rating: 4.9,
+    totalOrder: 250,
+    category: "burger",
+    image:
+      "https://img.freepik.com/photos-premium/hamburger-laitue-tomate-du-fromage_62972-1595.jpg?w=360",
   },
 ];
 
-const MenuMeal = () => {
-  const [products, setProducts] = useState(initialProducts);
-
-  const incrementQuantity = (id:any) => {
-    setProducts((prevProducts) =>
-      prevProducts.map((product) =>
-        product.id === id ? { ...product, quantity: product.quantity + 1 } : product
-      )
-    );
-  };
-
-  const decrementQuantity = (id:any) => {
-    setProducts((prevProducts) =>
-      prevProducts.map((product) =>
-        product.id === id && product.quantity > 1
-          ? { ...product, quantity: product.quantity - 1 }
-          : product
-      )
-    );
-  };
-
-  const renderProductCard = (item:any) => (
-    <View key={item.id} style={styles.card}>
-      <View style={styles.header}>
-        <Text style={styles.discountText}>{item.discount} In Season</Text>
-      </View>
-  
-      <View style={styles.productRow}>
-        {/* Product Image */}
-        <Image source={{ uri: item.image }} style={styles.productImage} />
-  
-        <View style={styles.productDetails}>
-          <Text style={styles.name}>{item.name}</Text>
-          <Text style={styles.type}>Type: {item.type}</Text>
-          <Text style={styles.storageLife}>Storage Life: {item.storageLife}</Text>
-          <Text style={styles.price}>
-            Rs. {item.discountedPrice}{' '}
-            <Text style={styles.strikethrough}>Rs. {item.price}</Text>
-          </Text>
-        </View>
-  
-        {item.inStock ? (
-          <View style={styles.buttonGroup}>
-            <TouchableOpacity
-              style={styles.quantityButton}
-              onPress={() => decrementQuantity(item.id)}
-            >
-              <Text style={styles.quantityText}>-</Text>
-            </TouchableOpacity>
-  
-            <Text style={styles.quantityDisplay}>{item.quantity}</Text>
-  
-            <TouchableOpacity
-              style={styles.quantityButton}
-              onPress={() => incrementQuantity(item.id)}
-            >
-              <Text style={styles.quantityText}>+</Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <TouchableOpacity style={styles.notifyButton}>
-            <Text style={styles.notifyText}>NOTIFY</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-    </View>
-  );
-  
+const BurgerCard = ({ item }: any) => {
   return (
-    <View>
-      {products.map(renderProductCard)}
+    <View style={styles.container}>
+      <Link href={`/details/${item.id}`}>
+        <View style={styles.card}>
+          <View style={styles.rating}>
+            <AntDesign name="star" size={16} color="orange" />
+            <Text style={styles.ratingText}>{item.rating}</Text>
+          </View>
+          <Image source={{ uri: item.image }} style={styles.image} />
+          <Text style={styles.title}>{item.title}</Text>
+          <Text style={styles.description}>{item.description}</Text>
+          <Text style={styles.price}>${item.price.toFixed(2)}</Text>
+          <TouchableOpacity style={styles.addButton}>
+            <AntDesign name="plus" size={16} color="white" />
+          </TouchableOpacity>
+        </View>
+      </Link>
     </View>
   );
-  
+};
+
+const MenuMeal = () => {
+  return (
+    <ScrollView
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.listContainer}
+    >
+      {data.map((item) => (
+        <BurgerCard key={item.id} item={item} />
+      ))}
+    </ScrollView>
+  );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    marginBottom: 5,
+  },
+  listContainer: {
+    flexDirection: "row",
+    paddingHorizontal: 16,
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    gap: 3,
+  },
+
   card: {
-    backgroundColor: '#fff',
-    padding: 10,
-    marginVertical: 8,
-    marginHorizontal: 16,
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 5,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  discountText: {
-    backgroundColor: 'orange',
-    color: '#fff',
-    paddingHorizontal: 5,
-    borderRadius: 3,
-    fontWeight: 'bold',
-    fontSize: 12,
-  },
-  productRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  productImage: {
-    width: 60,
-    height: 60,
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 15,
     marginRight: 15,
+    width: 180,
+    height: "60%",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3.84,
+    elevation: 10,
   },
-  productDetails: {
-    flex: 1,
+  rating: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
   },
-  name: {
+  ratingText: {
+    marginLeft: 5,
+    color: "black",
+    fontWeight: "bold",
+  },
+  image: {
+    width: "100%",
+    height: 90,
+    resizeMode: "contain",
+    marginBottom: 10,
+  },
+  title: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
+    color: "black",
   },
-  type: {
+  description: {
     fontSize: 12,
-    color: 'gray',
-  },
-  storageLife: {
-    fontSize: 12,
-    color: 'gray',
-  },
-  price: {
-    fontSize: 16,
+    color: "gray",
     marginVertical: 5,
   },
-  strikethrough: {
-    textDecorationLine: 'line-through',
-    color: 'gray',
+  price: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "red",
   },
-  buttonGroup: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  quantityButton: {
-    backgroundColor: 'orange',
-    padding: 5,
-    borderRadius: 5,
-    marginHorizontal: 3,
-  },
-  quantityText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  quantityDisplay: {
-    fontSize: 16,
-    paddingHorizontal: 10,
-  },
-  notifyButton: {
-    backgroundColor: 'gray',
-    padding: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-  },
-  notifyText: {
-    color: '#fff',
-    fontWeight: 'bold',
+  addButton: {
+    backgroundColor: "red",
+    padding: 8,
+    borderRadius: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: -30,
+    alignSelf: "flex-end",
   },
 });
 

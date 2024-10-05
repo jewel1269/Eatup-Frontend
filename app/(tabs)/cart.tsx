@@ -1,27 +1,82 @@
 import React, { useState } from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList, ScrollView } from "react-native";
-import { AntDesign } from '@expo/vector-icons';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  ScrollView,
+} from "react-native";
+import { AntDesign } from "@expo/vector-icons";
 import { router } from "expo-router";
 
 export default function Cart() {
   // Example data (you can replace this with your actual data)
   const [items, setItems] = useState([
-    { id: '1', name: 'Chicken Burger', restaurant: 'Burger Factory LTD', price: 20, quantity: 1, image:'https://www.crumbtopbaking.com/wp-content/uploads/2022/06/Air-Fryer-Chicken-Patties-10.jpg' },
-    { id: '2', name: 'Onion Pizza', restaurant: 'Pizza Palace', price: 15, quantity: 1, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_8EgE8ECPk3QfIOU0_IrqAV2ntnlqVDswfA&s' },
-    { id: '3', name: 'Spicy Shawarma', restaurant: 'Hot Cool Spot', price: 15, quantity: 1, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAH5S_xW_AfeHudBUxhPjj5ta62v3b6tM6Lg&s' },
-    { id: '4', name: 'Chicken Burger', restaurant: 'Burger Factory LTD', price: 20, quantity: 1, image:'https://www.crumbtopbaking.com/wp-content/uploads/2022/06/Air-Fryer-Chicken-Patties-10.jpg' },
-    { id: '5', name: 'Onion Pizza', restaurant: 'Pizza Palace', price: 15, quantity: 1, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_8EgE8ECPk3QfIOU0_IrqAV2ntnlqVDswfA&s' },
-    { id: '6', name: 'Spicy Shawarma', restaurant: 'Hot Cool Spot', price: 15, quantity: 1, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAH5S_xW_AfeHudBUxhPjj5ta62v3b6tM6Lg&s' },
+    {
+      id: "1",
+      name: "Chicken Burger",
+      restaurant: "Burger Factory LTD",
+      price: 20,
+      quantity: 1,
+      image:
+        "https://www.crumbtopbaking.com/wp-content/uploads/2022/06/Air-Fryer-Chicken-Patties-10.jpg",
+    },
+    {
+      id: "2",
+      name: "Onion Pizza",
+      restaurant: "Pizza Palace",
+      price: 15,
+      quantity: 1,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_8EgE8ECPk3QfIOU0_IrqAV2ntnlqVDswfA&s",
+    },
+    {
+      id: "3",
+      name: "Spicy Shawarma",
+      restaurant: "Hot Cool Spot",
+      price: 15,
+      quantity: 1,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAH5S_xW_AfeHudBUxhPjj5ta62v3b6tM6Lg&s",
+    },
+    {
+      id: "4",
+      name: "Chicken Burger",
+      restaurant: "Burger Factory LTD",
+      price: 20,
+      quantity: 1,
+      image:
+        "https://www.crumbtopbaking.com/wp-content/uploads/2022/06/Air-Fryer-Chicken-Patties-10.jpg",
+    },
+    {
+      id: "5",
+      name: "Onion Pizza",
+      restaurant: "Pizza Palace",
+      price: 15,
+      quantity: 1,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_8EgE8ECPk3QfIOU0_IrqAV2ntnlqVDswfA&s",
+    },
+    {
+      id: "6",
+      name: "Spicy Shawarma",
+      restaurant: "Hot Cool Spot",
+      price: 15,
+      quantity: 1,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAH5S_xW_AfeHudBUxhPjj5ta62v3b6tM6Lg&s",
+    },
   ]);
-  
 
   // Update quantity of items
-  const updateQuantity = (id:any, type:any) => {
-    const updatedItems = items.map(item => {
+  const updateQuantity = (id: any, type: any) => {
+    const updatedItems = items.map((item) => {
       if (item.id === id) {
-        if (type === 'increment') {
+        if (type === "increment") {
           return { ...item, quantity: item.quantity + 1 };
-        } else if (type === 'decrement' && item.quantity > 1) {
+        } else if (type === "decrement" && item.quantity > 1) {
           return { ...item, quantity: item.quantity - 1 };
         }
       }
@@ -29,17 +84,20 @@ export default function Cart() {
     });
     setItems(updatedItems);
   };
- 
+
   // Calculate total
-  const subTotal = items.reduce((total, item) => total + item.price * item.quantity, 0);
+  const subTotal = items.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0
+  );
   const deliveryCharge = 10;
   const discount = subTotal > 150 ? 10 : 0;
   const total = subTotal + deliveryCharge - discount;
 
-// back to pevious page
-  const handleBack =()=>{
-    router.back()
-  }
+  // back to pevious page
+  const handleBack = () => {
+    router.back();
+  };
 
   return (
     <View style={styles.container}>
@@ -56,25 +114,29 @@ export default function Cart() {
         data={items}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-         <ScrollView>
-             <View style={styles.itemContainer}>
-            <Image source={{uri:item?.image}} style={styles.itemImage} />
-            <View style={styles.itemDetails}>
-              <Text style={styles.itemTitle}>{item.name}</Text>
-              <Text style={styles.itemSubtitle}>{item.restaurant}</Text>
-              <Text style={styles.itemPrice}>${item.price}</Text>
+          <ScrollView>
+            <View style={styles.itemContainer}>
+              <Image source={{ uri: item?.image }} style={styles.itemImage} />
+              <View style={styles.itemDetails}>
+                <Text style={styles.itemTitle}>{item.name}</Text>
+                <Text style={styles.itemSubtitle}>{item.restaurant}</Text>
+                <Text style={styles.itemPrice}>${item.price}</Text>
+              </View>
+              <View style={styles.quantityContainer}>
+                <TouchableOpacity
+                  onPress={() => updateQuantity(item.id, "decrement")}
+                >
+                  <AntDesign name="minuscircle" size={24} color="red" />
+                </TouchableOpacity>
+                <Text style={styles.quantityText}>{item.quantity}</Text>
+                <TouchableOpacity
+                  onPress={() => updateQuantity(item.id, "increment")}
+                >
+                  <AntDesign name="pluscircle" size={24} color="red" />
+                </TouchableOpacity>
+              </View>
             </View>
-            <View style={styles.quantityContainer}>
-              <TouchableOpacity onPress={() => updateQuantity(item.id, 'decrement')}>
-                <AntDesign name="minuscircle" size={24} color="red" />
-              </TouchableOpacity>
-              <Text style={styles.quantityText}>{item.quantity}</Text>
-              <TouchableOpacity onPress={() => updateQuantity(item.id, 'increment')}>
-                <AntDesign name="pluscircle" size={24} color="red" />
-              </TouchableOpacity>
-            </View>
-          </View>
-         </ScrollView>
+          </ScrollView>
         )}
       />
 
@@ -109,23 +171,23 @@ export default function Cart() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     paddingHorizontal: 20,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 20,
   },
   headerText: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginLeft: 10,
   },
   itemContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f9f9f9',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f9f9f9",
     padding: 10,
     marginVertical: 8,
     borderRadius: 10,
@@ -141,20 +203,20 @@ const styles = StyleSheet.create({
   },
   itemTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   itemSubtitle: {
     fontSize: 14,
-    color: '#888',
+    color: "#888",
   },
   itemPrice: {
     fontSize: 16,
-    color: '#e74c3c',
+    color: "#e74c3c",
     marginTop: 5,
   },
   quantityContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   quantityText: {
     fontSize: 16,
@@ -162,34 +224,37 @@ const styles = StyleSheet.create({
   },
   summaryContainer: {
     marginTop: 20,
-    padding: 20,
-    backgroundColor: '#ff4d4d',
+    padding: 10,
+    borderWidth: 1,
+    shadowOpacity:3,
+    shadowRadius:10,
+    shadowColor:"red",
     borderRadius: 10,
   },
   summaryRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 10,
   },
   summaryText: {
-    color: '#fff',
+    color: "black",
     fontSize: 16,
   },
   totalText: {
-    color: '#fff',
+    color: "black",
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   orderButton: {
-    backgroundColor: '#ff4d4d',
-    paddingVertical: 15,
-    alignItems: 'center',
+    backgroundColor: "#ff4d4d",
+    paddingVertical: 8,
+    alignItems: "center",
     borderRadius: 10,
     marginVertical: 20,
   },
   orderButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });

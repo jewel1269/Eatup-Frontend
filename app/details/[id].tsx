@@ -92,7 +92,7 @@ const DetailsPage = () => {
   }
 
   const handleBack = ()=>{
-    router.replace("/(tabs)/home")
+    router.back()
   }
 
   return (
