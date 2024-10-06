@@ -6,7 +6,7 @@ import { View, Text, StyleSheet } from 'react-native';
 // create a component
 const Meal = () => {
     return (
-        <View>
+        <View style={{height:"100%"}}>
            <FilterModal/>
         </View>
     );
