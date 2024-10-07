@@ -1,6 +1,7 @@
 import { Entypo } from "@expo/vector-icons";
+import axios from "axios";
 import { Link, router } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -13,14 +14,40 @@ import {
   ToastAndroid,
   ImageBackground,
 } from "react-native";
+import useAuth from "../useAuth/useAuth";
 
 const ProfileUpdateScreen = () => {
   const [name, setName] = useState("Jewel Mia");
-  const [email, setEmail] = useState("kim.jennie@gmail.com");
   const [phoneNumber, setPhoneNumber] = useState("+6281234567890");
   const [website, setWebsite] = useState("Uttara-10, Dhaka, BD");
   const [password, setPassword] = useState("********");
   const [loading, setLoading] = useState(false);
+  const [userData, setUserData] = useState<any>()
+  const {user} = useAuth()
+  const email = user?.email;
+
+   useEffect(() => {
+    // Define an inner async function
+    const fetchUser = async () => {
+      try {
+        const response = await axios.get(`http://10.0.2.2:5000/users/users?email=${email}`);
+        
+        if (response && response.data) {
+          console.log('User data:', response.data);
+          setUserData(response.data)
+        } else {
+          console.log('User not found');
+        }
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      }
+    };
+
+    // Call the async function
+    fetchUser();
+  }, [email]); 
+
+
 
   const handleUpdate = () => {
     setLoading(true);
@@ -74,13 +101,13 @@ const ProfileUpdateScreen = () => {
         </View>
 
         {/* Name */}
-        <Text style={styles.nameText}>{name}</Text>
+        <Text style={styles.nameText}>{userData?.name}</Text>
         <Text style={styles.subtitleText}>Engineer</Text>
 
         {/* Name Input */}
         <TextInput
           style={styles.input}
-          value={name}
+          value={userData?.name}
           onChangeText={setName}
           placeholder="Name"
         />
@@ -89,7 +116,7 @@ const ProfileUpdateScreen = () => {
         <TextInput
           style={styles.input}
           value={email}
-          onChangeText={setEmail}
+          onChangeText={userData?.email}
           placeholder="Email"
           keyboardType="email-address"
         />

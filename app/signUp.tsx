@@ -5,6 +5,9 @@ import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/components/AllComponent/Firebase/Firebase';
+import axios from 'axios';
+
+
 
 const SignUpScreen = () => {
   const [name, setName] = useState('');
@@ -51,24 +54,37 @@ const SignUpScreen = () => {
     return isValid;
   };
 
+
   // Handle form submission
-  const handleSignUp = () => {
-    if (validateForm()) {
-      createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          const user = userCredential.user;
-          ToastAndroid.show("Successfully Registred", ToastAndroid.SHORT); 
-          console.log('User logged in:', user);
-          router.replace("/signIn")
+ const handleSignUp = async () => {
+  if (validateForm()) {
+    try {
+      const userInfo = { name, email, password };
+      console.log('User Info:', userInfo);
+      
+      // Create user with Firebase authentication
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      console.log('Firebase user:', user);
 
-        })
-
-        .catch((error) => {
-          console.error('Login error:', error.message);
-          ToastAndroid.show(`Login failed: ${error.message}`, ToastAndroid.SHORT); 
-        });
+      // Use Android emulator IP to access localhost
+      const response = await axios.post("http://10.0.2.2:5000/users", userInfo);
+      console.log('Server response:', response);
+      
+      // Check if the registration was successful
+      if (response && response.data) {
+        ToastAndroid.show("Successfully Registered", ToastAndroid.SHORT);
+        router.replace("/signIn");
+      } else {
+        throw new Error("Invalid response from server");
+      }
+      
+    } catch (error) {
+      console.error('Registration error:', error);
+      ToastAndroid.show(`Registration failed:`, ToastAndroid.SHORT);
     }
-  };
+  }
+};
   
 
   return (

@@ -1,16 +1,45 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, Switch, TouchableOpacity, TextInput, ToastAndroid, ScrollView, Dimensions } from 'react-native';
 import { AntDesign, FontAwesome } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/components/AllComponent/Firebase/Firebase';
 
-const { width } = Dimensions.get('window'); // Get device width
+import axios from 'axios';
+import useAuth from '@/components/AllComponent/useAuth/useAuth';
+
+const { width } = Dimensions.get('window'); 
 
 export default function ProfileScreen() {
   const [isUSCitizen, setIsUSCitizen] = useState(false);
-
   const toggleSwitch = () => setIsUSCitizen(previousState => !previousState);
+  const [userData, setUserData] = useState<any>()
+  const {user} = useAuth()
+  const email = user?.email;
+
+   useEffect(() => {
+    // Define an inner async function
+    const fetchUser = async () => {
+      try {
+        const response = await axios.get(`http://10.0.2.2:5000/users/users?email=${email}`);
+        
+        if (response && response.data) {
+          console.log('User data:', response.data);
+          setUserData(response.data)
+        } else {
+          console.log('User not found');
+        }
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      }
+    };
+
+    // Call the async function
+    fetchUser();
+  }, [email]); 
+
+
+   
 
   const handleBack = () => {
     router.back();
@@ -61,7 +90,7 @@ export default function ProfileScreen() {
         <Text style={styles.sectionTitle}>Personal Info</Text>
         <View style={styles.infoItem}>
           <Text style={styles.label}>Your name</Text>
-          <Text style={styles.value}>Jewel Mia</Text>
+          <Text style={styles.value}>{userData?.name}</Text>
         </View>
         <View style={styles.infoItem}>
           <Text style={styles.label}>Occupation</Text>
@@ -98,7 +127,7 @@ export default function ProfileScreen() {
           <Text style={styles.label}>Email</Text>
           <TextInput
             style={styles.input}
-            defaultValue="Jewelmia@mail.com"
+            defaultValue={userData?.email}
             editable={false}
           />
         </View>
@@ -134,9 +163,9 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   profilePic: {
-    width: width * 0.25, // 25% of screen width
-    height: width * 0.25, // 25% of screen width
-    borderRadius: (width * 0.25) / 2, // Circular profile picture
+    width: width * 0.25, 
+    height: width * 0.25, 
+    borderRadius: (width * 0.25) / 2, 
     borderWidth: 3,
     borderColor: 'white',
   },
