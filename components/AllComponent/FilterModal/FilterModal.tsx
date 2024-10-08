@@ -176,7 +176,6 @@ const FilterModal = () => {
           <MenuMeal />
         </ScrollView>
       </View>
-      <Text>Hello</Text>
     </View>
   );
 };

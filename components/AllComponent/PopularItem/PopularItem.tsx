@@ -1,18 +1,23 @@
 import { AntDesign } from "@expo/vector-icons";
-import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, ToastAndroid } from "react-native";
 import Item from "./Item/Item";
+import { Link } from "expo-router";
+import axios from "axios";
 
 // create a component
 const PopularItem = () => {
+ 
   return (
     <View>
       <View style={styles.header}>
         <Text style={styles.title}>Popular Meal Menu</Text>
-        <View style={styles.headerTitle}>
+        <Link href={"/meal"}>
+        <View  style={styles.headerTitle}>
           <Text>See All</Text>
-          <AntDesign name="caretright" size={16} color="gray" />
+          <AntDesign name="caretright"  size={16} color="gray" />
         </View>
+        </Link>
       </View>
         <View style={styles.item}>
         <Item />
@@ -32,7 +37,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   title: {
-    fontFamily: "Playfair Display", 
     fontSize: 19,
     fontWeight: "bold",
   },

@@ -9,6 +9,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Dimensions,
   Alert,
   ToastAndroid,
 } from "react-native";
@@ -16,10 +17,9 @@ import LottieView from "lottie-react-native";
 
 const DetailsPage = () => {
   const { id } = useLocalSearchParams<any>();
-  const router = useRouter();
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+
   const [cart, setCart] = useState<any[]>([]);
 
   const addToCart = async (item: any) => {
@@ -60,24 +60,24 @@ const DetailsPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://10.0.2.2:5000/menu/menumeal");
+        const response = await axios.get(
+          "http://10.0.2.2:5000/menu/popular"
+        );
         setData(response.data);
-        setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
+      } finally {
         setLoading(false);
-        setError(true);
       }
     };
 
     fetchData();
   }, []);
 
-  const product = data.find((item) => item._id === id);
+  const router = useRouter();
 
-  const handleBack = () => {
-    router.replace("/meal");
-  };
+  // Convert id to a number, if necessary
+  const product = data.find((item) => item._id === id);
 
   // Show Lottie animation loader when data is being fetched
   if (loading) {
@@ -93,13 +93,17 @@ const DetailsPage = () => {
     );
   }
 
-  if (error || !product) {
+  if (!product) {
     return (
       <View style={styles.errorContainer}>
         <Text style={styles.errorText}>Product not found</Text>
       </View>
     );
   }
+
+  const handleBack = () => {
+    router.back();
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -116,9 +120,22 @@ const DetailsPage = () => {
 
       <View style={styles.infoSection}>
         <Text style={styles.popularText}>Popular</Text>
-        <View style={styles.titleRow}>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignContent: "center",
+          }}
+        >
           <Text style={styles.titleText}>{product.title}</Text>
-          <View style={styles.location}>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-around",
+              gap: 3,
+            }}
+          >
             <Entypo name="location" size={24} color="black" />
             <Text>Location</Text>
           </View>
@@ -137,6 +154,7 @@ const DetailsPage = () => {
         </View>
 
         <Text style={styles.descriptionText}>{product.description}</Text>
+
         <Text style={styles.ingredients}>• {product.category}</Text>
       </View>
 
@@ -149,22 +167,12 @@ const DetailsPage = () => {
   );
 };
 
+const { width } = Dimensions.get("window");
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-  },
-  loaderContainer: {
-    flex: 1,
-    justifyContent: "center",
-    height: 20,
-    width: 20,
-    alignSelf: "center",
-    alignItems: "center",
-  },
-  lottie: {
-    width: 200,
-    height: 200,
   },
   header: {
     flexDirection: "row",
@@ -182,7 +190,7 @@ const styles = StyleSheet.create({
   },
   productImage: {
     width: "100%",
-    height: 300,
+    height: width * 0.6, // Responsive height
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
   },
@@ -195,19 +203,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 8,
   },
-  titleRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
   titleText: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 12,
-  },
-  location: {
-    flexDirection: "row",
-    alignItems: "center",
   },
   ratingRow: {
     flexDirection: "row",
@@ -262,6 +261,18 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 18,
     color: "red",
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: "center",
+    height: 20,
+    width: 20,
+    alignSelf: "center",
+    alignItems: "center",
+  },
+  lottie: {
+    width: 200,
+    height: 200,
   },
 });
 

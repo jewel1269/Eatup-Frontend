@@ -1,83 +1,20 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
-import { AntDesign } from '@expo/vector-icons';
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  ToastAndroid,
+  Alert,
+} from "react-native";
+import { AntDesign } from "@expo/vector-icons";
+import axios from "axios";
+import { Link } from "expo-router";
 
-const data = [
-  {
-    id: 2,
-    title: "Cheese Chiken",
-    description: "100 gr meat + onion + tomato + lettuce cheese",
-    price: 15.00,
-    rating: 4.5,
-    totalOrder: 200,
-    category: "burger",
-    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAxlqag1-uZmhNCzsNMJKQMqiXP3if06hiJg&s"
-  },
-  {
-    id: 3,
-    title: "Apple",
-    description: "100 gr veggie patty + lettuce + tomato",
-    price: 12.00,
-    rating: 4.2,
-    totalOrder: 150,
-    category: "burger",
-    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAR9krgdd110BLzGMRM-CETX5nzGwKS7dksg&s"
-  },
-  {
-    id: 4,
-    title: "Bief Curry",
-    description: "100 gr fish + lettuce + tartar sauce",
-    price: 18.00,
-    rating: 4.3,
-    totalOrder: 180,
-    category: "burger",
-    image: "https://static.vecteezy.com/system/resources/previews/040/146/397/non_2x/mutton-curry-or-lamb-curry-with-lettuce-leaves-letus-pata-on-a-wooden-plate-is-spicy-indian-cuisine-mutton-gravy-is-a-delicious-indian-curry-dish-of-soft-white-background-isolated-free-photo.jpg"
-  },
-  {
-    id: 5,
-    title: "Fruits Pack",
-    description: "100 gr beef + jalapeno + cheese",
-    price: 22.00,
-    rating: 4.8,
-    totalOrder: 220,
-    category: "burger",
-    image: "https://t4.ftcdn.net/jpg/00/53/14/41/360_F_53144147_Zx2dgnSeefxIjOQ5cjD4PBdZF4m8M7sm.jpg"
-  },
-  {
-    id: 6,
-    title: "BBQ Chiken",
-    description: "100 gr beef + BBQ sauce + onions",
-    price: 19.00,
-    rating: 4.6,
-    totalOrder: 190,
-    category: "burger",
-    image: "https://thumbs.dreamstime.com/z/generative-ai-grill-roast-bbq-chicken-legs-isolated-white-background-barbecued-chicken-leg-grilled-chicken-legs-fried-chicken-306864921.jpg"
-  },
-  {
-    id: 7,
-    title: "Double Burger",
-    description: "200 gr beef + double cheese + lettuce",
-    price: 25.00,
-    rating: 4.9,
-    totalOrder: 250,
-    category: "burger",
-    image: "https://img.freepik.com/photos-premium/hamburger-laitue-tomate-du-fromage_62972-1595.jpg?w=360"
-  }
-];
-
-interface MenuItemProps {
-  item: {
-    id: number;
-    title: string;
-    description: string;
-    price: number;
-    rating: number;
-    totalOrder: number;
-    image: string;
-  };
-}
-
-const MenuItem = ({ item }: MenuItemProps) => (
+const MenuItem = ({ item, addToCart }: any) => (
+ <Link href={`/popular/${item?._id}`}>
   <View style={styles.card}>
     <Image source={{ uri: item.image }} style={styles.image} />
     <View style={styles.info}>
@@ -89,57 +26,112 @@ const MenuItem = ({ item }: MenuItemProps) => (
         <Text style={styles.orders}>Sold: {item.totalOrder}</Text>
       </View>
       <View style={styles.orderBtn}>
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Order</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.addButton}>
-        <AntDesign name="plus" size={16} color="white" />
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.button}>
+          <Text style={styles.buttonText}>Order</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={()=>addToCart(item)} style={styles.addButton}>
+          <AntDesign name="plus" size={16} color="white" />
+        </TouchableOpacity>
       </View>
     </View>
   </View>
+ </Link>
 );
 
-const Item = () => (
-  <ScrollView style={styles.container} contentContainerStyle={styles.grid}>
-    {data.map((item) => (
-      <View key={item.id} style={styles.gridItem}>
-        <MenuItem item={item} />
-      </View>
-    ))}
-  </ScrollView>
-);
+const Item = () => {
+  const [data, setData] = useState<any[]>([]);
+  const [cart, setCart] = useState<any[]>([]);
+
+  const addToCart = async (item: any) => {
+    const cartItem = {
+      title: item.title,
+      description: item.description,
+      price: item.price,
+      rating: item.rating,
+      totalOrder: item.totalOrder,
+      category: item.category,
+      image: item.image,
+    };
+
+    try {
+      const response = await axios.post(
+        "http://10.0.2.2:5000/cart/add",
+        cartItem
+      );
+      if (response.status === 200) {
+        setCart((prevCart) => [...prevCart, item]);
+
+        Alert.alert(
+          `${item.title} has been added to your cart!`,
+        );
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+
+      ToastAndroid.show(
+        `${item.title} failed to add item to cart`,
+        ToastAndroid.SHORT
+      );
+    }
+  };
+
+  // Data Fetching from backend
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          "http://10.0.2.2:5000/menu/burgerList"
+        );
+        setData(response.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  return (
+    <ScrollView style={styles.container} contentContainerStyle={styles.grid}>
+      {data.map((item) => (
+        <View key={item.title} style={styles.gridItem}>
+          <MenuItem item={item} addToCart={addToCart}/>
+        </View>
+      ))}
+    </ScrollView>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: "white",
   },
-  orderBtn:{
-  flexDirection:"row",
-  justifyContent:"space-between"
+  orderBtn: {
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
   },
   gridItem: {
-    flexBasis: '48%', 
+    flexBasis: "48%",
     marginBottom: 20,
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 15,
     borderRadius: 10,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 10,
     elevation: 3,
   },
   image: {
-    width: '100%',
+    width: "100%",
     height: 120,
     borderRadius: 10,
   },
@@ -148,49 +140,49 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   description: {
-    color: '#555',
+    color: "#555",
   },
   price: {
-    color: '#27ae60',
-    fontWeight: 'bold',
+    color: "#27ae60",
+    fontWeight: "bold",
   },
   row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: 10,
-    gap:2
+    gap: 2,
   },
   rating: {
-    color: '#f1c40f',
+    color: "#f1c40f",
   },
   orders: {
-    color: '#3498db',
-    marginLeft:3
+    color: "#3498db",
+    marginLeft: 3,
   },
   button: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FF6666',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FF6666",
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 5,
     marginTop: 10,
   },
   buttonText: {
-    color: 'white',
+    color: "white",
     marginRight: 5,
   },
   addButton: {
-    backgroundColor: '#FF6666',
+    backgroundColor: "#FF6666",
     padding: 8,
     borderRadius: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginTop: -30,
-    alignSelf: 'flex-end',
+    alignSelf: "flex-end",
   },
 });
 
