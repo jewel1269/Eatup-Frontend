@@ -59,6 +59,7 @@ const MenuMeal = () => {
 
   const addToCart = async (item: any) => {
     const cartItem = {
+      id:item?._id,
       title: item.title,
       description: item.description,
       price: item.price,

@@ -13,30 +13,32 @@ import { AntDesign } from "@expo/vector-icons";
 import axios from "axios";
 import { Link } from "expo-router";
 
+
 const MenuItem = ({ item, addToCart }: any) => (
- <Link href={`/popular/${item?._id}`}>
-  <View style={styles.card}>
-    <Image source={{ uri: item.image }} style={styles.image} />
-    <View style={styles.info}>
-      <Text style={styles.title}>{item.title}</Text>
-      <Text style={styles.description}>{item.description.slice(0, 15)}</Text>
-      <Text style={styles.price}>${item.price.toFixed(2)}</Text>
-      <View style={styles.row}>
-        <Text style={styles.rating}>Rating: {item.rating}</Text>
-        <Text style={styles.orders}>Sold: {item.totalOrder}</Text>
-      </View>
-      <View style={styles.orderBtn}>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Order</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={()=>addToCart(item)} style={styles.addButton}>
-          <AntDesign name="plus" size={16} color="white" />
-        </TouchableOpacity>
+  <Link href={`/popular/${item._id}`}>
+    <View style={styles.card}>
+      <Image source={{ uri: item.image }} style={styles.image} />
+      <View style={styles.info}>
+        <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.description}>{item.description.slice(0, 15)}</Text>
+        <Text style={styles.price}>${item.price.toFixed(2)}</Text>
+        <View style={styles.row}>
+          <Text style={styles.rating}>Rating: {item.rating}</Text>
+          <Text style={styles.orders}>Sold: {item.totalOrder}</Text>
+        </View>
+        <View style={styles.orderBtn}>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>Order</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => addToCart(item)} style={styles.addButton}>
+            <AntDesign name="plus" size={16} color="white" />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
-  </View>
- </Link>
+  </Link>
 );
+
 
 const Item = () => {
   const [data, setData] = useState<any[]>([]);
@@ -44,6 +46,7 @@ const Item = () => {
 
   const addToCart = async (item: any) => {
     const cartItem = {
+      id:item?._id,
       title: item.title,
       description: item.description,
       price: item.price,

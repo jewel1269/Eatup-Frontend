@@ -24,6 +24,7 @@ const DetailsPage = () => {
 
   const addToCart = async (item: any) => {
     const cartItem = {
+      id: item?._id,
       title: item.title,
       description: item.description,
       price: item.price,
@@ -102,7 +103,7 @@ const DetailsPage = () => {
   }
 
   const handleBack = () => {
-    router.back();
+    router.replace("/home");
   };
 
   return (

@@ -93,8 +93,8 @@ export default function ProfileScreen() {
           <Text style={styles.value}>{userData?.name}</Text>
         </View>
         <View style={styles.infoItem}>
-          <Text style={styles.label}>Occupation</Text>
-          <Text style={styles.value}>Manager</Text>
+          <Text style={styles.label}>Address</Text>
+          <Text style={styles.value}>{userData?.address}</Text>
         </View>
         <View style={styles.infoItem}>
           <Text style={styles.label}>Employer</Text>
@@ -119,7 +119,7 @@ export default function ProfileScreen() {
           <Text style={styles.label}>Phone number</Text>
           <TextInput
             style={styles.input}
-            defaultValue="+8801684321082"
+            defaultValue={userData?.phoneNumber}
             editable={false}
           />
         </View>

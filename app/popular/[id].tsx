@@ -15,15 +15,19 @@ import {
 } from "react-native";
 import LottieView from "lottie-react-native";
 
-const DetailsPage = () => {
-  const { id } = useLocalSearchParams<any>();
-  const [data, setData] = useState<any[]>([]);
+const PopularDetails = () => {
+  const { id } = useLocalSearchParams();
+  const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-
   const [cart, setCart] = useState<any[]>([]);
 
+  // Check the id being passed for debugging purposes
+  console.log(product);
+
+  // Function to add item to the cart
   const addToCart = async (item: any) => {
     const cartItem = {
+      id: item?._id,
       title: item.title,
       description: item.description,
       price: item.price,
@@ -35,15 +39,13 @@ const DetailsPage = () => {
 
     try {
       const response = await axios.post(
-        "http://10.0.2.2:5000/cart/add",
+        "http://10.0.2.2:5000/cart/add", // API endpoint to add to cart
         cartItem
       );
       if (response.status === 200) {
-        setCart((prevCart) => [...prevCart, item]);
+        setCart((prevCart) => [...prevCart, item]); // Add item to local cart state
 
-        Alert.alert(
-          `${item.title} has been added to your cart!`,
-        );
+        Alert.alert(`${item.title} has been added to your cart!`);
       }
     } catch (error) {
       console.error("Error adding to cart:", error);
@@ -55,15 +57,14 @@ const DetailsPage = () => {
     }
   };
 
-
-  // Data Fetching from backend
+  // Fetch data from backend API based on the product ID
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "http://10.0.2.2:5000/menu/popular"
+          `http://10.0.2.2:5000/menu/popular/${id}`
         );
-        setData(response.data);
+        setProduct(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -71,15 +72,13 @@ const DetailsPage = () => {
       }
     };
 
-    fetchData();
-  }, []);
+    if (id) {
+      fetchData();
+    }
+  }, [id]);
 
   const router = useRouter();
 
-  // Convert id to a number, if necessary
-  const product = data.find((item) => item._id === id);
-
-  // Show Lottie animation loader when data is being fetched
   if (loading) {
     return (
       <View style={styles.loaderContainer}>
@@ -101,8 +100,9 @@ const DetailsPage = () => {
     );
   }
 
+  // Go back to the previous page
   const handleBack = () => {
-    router.back();
+    router.replace("/home");
   };
 
   return (
@@ -154,11 +154,13 @@ const DetailsPage = () => {
         </View>
 
         <Text style={styles.descriptionText}>{product.description}</Text>
-
         <Text style={styles.ingredients}>• {product.category}</Text>
       </View>
 
-      <TouchableOpacity onPress={()=>addToCart(product)} style={styles.addToCartButton}>
+      <TouchableOpacity
+        onPress={() => addToCart(product)}
+        style={styles.addToCartButton}
+      >
         <Text style={styles.addToCartText}>
           Add To Cart - ${product.price.toFixed(2)}
         </Text>
@@ -190,7 +192,7 @@ const styles = StyleSheet.create({
   },
   productImage: {
     width: "100%",
-    height: width * 0.6, // Responsive height
+    height: width * 0.6, // Responsive height based on screen width
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
   },
@@ -276,4 +278,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DetailsPage;
+export default PopularDetails;

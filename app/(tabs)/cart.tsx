@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,70 +10,34 @@ import {
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { router } from "expo-router";
+import axios from "axios";
 
 export default function Cart() {
   // Example data (you can replace this with your actual data)
-  const [items, setItems] = useState([
-    {
-      id: "1",
-      name: "Chicken Burger",
-      restaurant: "Burger Factory LTD",
-      price: 20,
-      quantity: 1,
-      image:
-        "https://www.crumbtopbaking.com/wp-content/uploads/2022/06/Air-Fryer-Chicken-Patties-10.jpg",
-    },
-    {
-      id: "2",
-      name: "Onion Pizza",
-      restaurant: "Pizza Palace",
-      price: 15,
-      quantity: 1,
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_8EgE8ECPk3QfIOU0_IrqAV2ntnlqVDswfA&s",
-    },
-    {
-      id: "3",
-      name: "Spicy Shawarma",
-      restaurant: "Hot Cool Spot",
-      price: 15,
-      quantity: 1,
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAH5S_xW_AfeHudBUxhPjj5ta62v3b6tM6Lg&s",
-    },
-    {
-      id: "4",
-      name: "Chicken Burger",
-      restaurant: "Burger Factory LTD",
-      price: 20,
-      quantity: 1,
-      image:
-        "https://www.crumbtopbaking.com/wp-content/uploads/2022/06/Air-Fryer-Chicken-Patties-10.jpg",
-    },
-    {
-      id: "5",
-      name: "Onion Pizza",
-      restaurant: "Pizza Palace",
-      price: 15,
-      quantity: 1,
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_8EgE8ECPk3QfIOU0_IrqAV2ntnlqVDswfA&s",
-    },
-    {
-      id: "6",
-      name: "Spicy Shawarma",
-      restaurant: "Hot Cool Spot",
-      price: 15,
-      quantity: 1,
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAH5S_xW_AfeHudBUxhPjj5ta62v3b6tM6Lg&s",
-    },
-  ]);
+  const [items, setItems] = useState<any>([]);
+
+  //fetchData
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          "http://10.0.2.2:5000/cart/meals"
+        );
+        setItems(response.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  console.log(items);
 
   // Update quantity of items
   const updateQuantity = (id: any, type: any) => {
-    const updatedItems = items.map((item) => {
-      if (item.id === id) {
+    const updatedItems = items.map((item: any) => {
+      if (item._id === id) {
         if (type === "increment") {
           return { ...item, quantity: item.quantity + 1 };
         } else if (type === "decrement" && item.quantity > 1) {
@@ -87,17 +51,22 @@ export default function Cart() {
 
   // Calculate total
   const subTotal = items.reduce(
-    (total, item) => total + item.price * item.quantity,
+    (total: any, item: any) => total + item.price * item.quantity,
     0
   );
   const deliveryCharge = 10;
-  const discount = subTotal > 150 ? 10 : 0;
+  const discount = subTotal > 100 ? 10 : 0;
   const total = subTotal + deliveryCharge - discount;
 
   // back to pevious page
   const handleBack = () => {
     router.back();
   };
+
+  //hhandleOrder
+  const handleOrder =()=>{
+    router.push("/order")
+  }
 
   return (
     <View style={styles.container}>
@@ -112,25 +81,25 @@ export default function Cart() {
       {/* Order Items List */}
       <FlatList
         data={items}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id} 
         renderItem={({ item }) => (
           <ScrollView>
             <View style={styles.itemContainer}>
               <Image source={{ uri: item?.image }} style={styles.itemImage} />
               <View style={styles.itemDetails}>
-                <Text style={styles.itemTitle}>{item.name}</Text>
-                <Text style={styles.itemSubtitle}>{item.restaurant}</Text>
+                <Text style={styles.itemTitle}>{item.title}</Text>
+                <Text style={styles.itemSubtitle}>{item.description.slice(0, 20)}****</Text>
                 <Text style={styles.itemPrice}>${item.price}</Text>
               </View>
               <View style={styles.quantityContainer}>
                 <TouchableOpacity
-                  onPress={() => updateQuantity(item.id, "decrement")}
+                  onPress={() => updateQuantity(item._id, "decrement")}
                 >
                   <AntDesign name="minuscircle" size={24} color="red" />
                 </TouchableOpacity>
                 <Text style={styles.quantityText}>{item.quantity}</Text>
                 <TouchableOpacity
-                  onPress={() => updateQuantity(item.id, "increment")}
+                  onPress={() => updateQuantity(item._id, "increment")} 
                 >
                   <AntDesign name="pluscircle" size={24} color="red" />
                 </TouchableOpacity>
@@ -161,7 +130,7 @@ export default function Cart() {
       </View>
 
       {/* Place Order Button */}
-      <TouchableOpacity style={styles.orderButton}>
+      <TouchableOpacity onPress={handleOrder} style={styles.orderButton}>
         <Text style={styles.orderButtonText}>Place My Order</Text>
       </TouchableOpacity>
     </View>
@@ -226,9 +195,9 @@ const styles = StyleSheet.create({
     marginTop: 20,
     padding: 10,
     borderWidth: 1,
-    shadowOpacity:3,
-    shadowRadius:10,
-    shadowColor:"red",
+    shadowOpacity: 3,
+    shadowRadius: 10,
+    shadowColor: "red",
     borderRadius: 10,
   },
   summaryRow: {
