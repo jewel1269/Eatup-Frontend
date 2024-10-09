@@ -83,7 +83,7 @@ const Item = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "http://10.0.2.2:5000/menu/burgerList"
+          "http://10.0.2.2:5000/menu/popular"
         );
         setData(response.data);
       } catch (error) {

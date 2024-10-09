@@ -73,7 +73,7 @@ const Chat = () => {
           <MaterialIcons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Chat</Text>
-        <MaterialIcons name="notifications" size={24} color="black" />
+        <MaterialIcons onPress={()=>router.push("/notifications")} name="notifications" size={24} color="black" />
       </View>
 
       <GiftedChat

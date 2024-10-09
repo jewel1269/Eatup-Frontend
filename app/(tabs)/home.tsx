@@ -6,8 +6,37 @@ import Category from "@/components/AllComponent/Category/Category";
 import BurgerList from "@/components/AllComponent/BurgerList/BurgerList";
 import PopularItem from "@/components/AllComponent/PopularItem/PopularItem";
 import { Link } from "expo-router";
+import { useEffect, useState } from "react";
+import useAuth from "@/components/AllComponent/useAuth/useAuth";
+import axios from "axios";
 
 export default function HomeScreen() {
+
+  const [userData, setUserData] = useState<any>()
+  const {user} = useAuth()
+  const email = user?.email;
+
+   useEffect(() => {
+    // Define an inner async function
+    const fetchUser = async () => {
+      try {
+        const response = await axios.get(`http://10.0.2.2:5000/users/users?email=${email}`);
+        
+        if (response && response.data) {
+          console.log('User data:', response.data);
+          setUserData(response.data)
+        } else {
+          console.log('User not found');
+        }
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      }
+    };
+
+    // Call the async function
+    fetchUser();
+  }, [email]); 
+
   
   return (
     <View style={styles.container}>
@@ -30,7 +59,7 @@ export default function HomeScreen() {
             size={24}
             color="black"
           />
-          <Text style={styles.locationText}>Uttara-10, Dhaka, Bd</Text>
+          <Text style={styles.locationText}>{userData?.address}</Text>
         </View>
        <Link style={{
             marginRight:8,

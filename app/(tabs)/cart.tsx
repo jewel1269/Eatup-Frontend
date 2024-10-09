@@ -9,7 +9,7 @@ import {
   ScrollView,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { Link, router } from "expo-router";
 import axios from "axios";
 
 export default function Cart() {
@@ -87,8 +87,10 @@ export default function Cart() {
             <View style={styles.itemContainer}>
               <Image source={{ uri: item?.image }} style={styles.itemImage} />
               <View style={styles.itemDetails}>
-                <Text style={styles.itemTitle}>{item.title}</Text>
-                <Text style={styles.itemSubtitle}>{item.description.slice(0, 20)}****</Text>
+               <Link href={`/cart/${item?._id}`}>
+               <Text style={styles.itemTitle}>{item.title}</Text>
+               <Text style={styles.itemSubtitle}>{item.description.slice(0, 20)}****</Text>
+               </Link>
                 <Text style={styles.itemPrice}>${item.price}</Text>
               </View>
               <View style={styles.quantityContainer}>
@@ -131,7 +133,7 @@ export default function Cart() {
 
       {/* Place Order Button */}
       <TouchableOpacity onPress={handleOrder} style={styles.orderButton}>
-        <Text style={styles.orderButtonText}>Place My Order</Text>
+        <Text style={styles.orderButtonText}>Place CheckOut</Text>
       </TouchableOpacity>
     </View>
   );

@@ -49,7 +49,6 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         paddingLeft: 40, 
         color: 'black',
-        fontFamily:"Playfair"
         
     },
 });

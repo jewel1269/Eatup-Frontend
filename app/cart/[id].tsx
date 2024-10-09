@@ -9,22 +9,19 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Dimensions,
   Alert,
   ToastAndroid,
 } from "react-native";
 import LottieView from "lottie-react-native";
 
-const PopularDetails = () => {
-  const { id } = useLocalSearchParams();
-  const [product, setProduct] = useState<any>(null);
+const CartDetails = () => {
+  const { id } = useLocalSearchParams<any>();
+  const router = useRouter();
+  const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [cart, setCart] = useState<any[]>([]);
 
-  // Check the id being passed for debugging purposes
-  console.log(product);
-
-  // Function to add item to the cart
   const addToCart = async (item: any) => {
     const cartItem = {
       id: item?._id,
@@ -39,13 +36,15 @@ const PopularDetails = () => {
 
     try {
       const response = await axios.post(
-        "http://10.0.2.2:5000/cart/add", // API endpoint to add to cart
+        "http://10.0.2.2:5000/cart/add",
         cartItem
       );
       if (response.status === 200) {
-        setCart((prevCart) => [...prevCart, item]); // Add item to local cart state
+        setCart((prevCart) => [...prevCart, item]);
 
-        Alert.alert(`${item.title} has been added to your cart!`);
+        Alert.alert(
+          `${item.title} has been added to your cart!`,
+        );
       }
     } catch (error) {
       console.error("Error adding to cart:", error);
@@ -57,28 +56,31 @@ const PopularDetails = () => {
     }
   };
 
-  // Fetch data from backend API based on the product ID
+
+  // Data Fetching from backend
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `http://10.0.2.2:5000/menu/popular/${id}`
-        );
-        setProduct(response.data);
+        const response = await axios.get("http://10.0.2.2:5000/cart/meals");
+        setData(response.data);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
-      } finally {
         setLoading(false);
+        setError(true);
       }
     };
 
-    if (id) {
-      fetchData();
-    }
-  }, [id]);
+    fetchData();
+  }, []);
 
-  const router = useRouter();
+  const product = data.find((item) => item._id === id);
 
+  const handleBack = () => {
+    router.replace("/meal");
+  };
+
+  // Show Lottie animation loader when data is being fetched
   if (loading) {
     return (
       <View style={styles.loaderContainer}>
@@ -92,18 +94,13 @@ const PopularDetails = () => {
     );
   }
 
-  if (!product) {
+  if (error || !product) {
     return (
       <View style={styles.errorContainer}>
         <Text style={styles.errorText}>Product not found</Text>
       </View>
     );
   }
-
-  // Go back to the previous page
-  const handleBack = () => {
-    router.replace("/home");
-  };
 
   return (
     <ScrollView style={styles.container}>
@@ -120,22 +117,9 @@ const PopularDetails = () => {
 
       <View style={styles.infoSection}>
         <Text style={styles.popularText}>Popular</Text>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignContent: "center",
-          }}
-        >
+        <View style={styles.titleRow}>
           <Text style={styles.titleText}>{product.title}</Text>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-around",
-              gap: 3,
-            }}
-          >
+          <View style={styles.location}>
             <Entypo name="location" size={24} color="black" />
             <Text>Location</Text>
           </View>
@@ -157,10 +141,7 @@ const PopularDetails = () => {
         <Text style={styles.ingredients}>• {product.category}</Text>
       </View>
 
-      <TouchableOpacity
-        onPress={() => addToCart(product)}
-        style={styles.addToCartButton}
-      >
+      <TouchableOpacity onPress={()=>addToCart(product)} style={styles.addToCartButton}>
         <Text style={styles.addToCartText}>
           Add To Cart - ${product.price.toFixed(2)}
         </Text>
@@ -169,12 +150,22 @@ const PopularDetails = () => {
   );
 };
 
-const { width } = Dimensions.get("window");
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: "center",
+    height: 20,
+    width: 20,
+    alignSelf: "center",
+    alignItems: "center",
+  },
+  lottie: {
+    width: 200,
+    height: 200,
   },
   header: {
     flexDirection: "row",
@@ -192,9 +183,8 @@ const styles = StyleSheet.create({
   },
   productImage: {
     width: "100%",
-    height: width * 0.9, // Responsive height based on screen width
+    height: 300,
     borderBottomLeftRadius: 20,
-    paddingHorizontal:10,
     borderBottomRightRadius: 20,
   },
   infoSection: {
@@ -206,10 +196,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 8,
   },
+  titleRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
   titleText: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 12,
+  },
+  location: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   ratingRow: {
     flexDirection: "row",
@@ -265,18 +264,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "red",
   },
-  loaderContainer: {
-    flex: 1,
-    justifyContent: "center",
-    height: 20,
-    width: 20,
-    alignSelf: "center",
-    alignItems: "center",
-  },
-  lottie: {
-    width: 200,
-    height: 200,
-  },
 });
 
-export default PopularDetails;
+export default CartDetails;

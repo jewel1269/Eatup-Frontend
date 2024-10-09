@@ -109,13 +109,13 @@ const SettingsScreen = ({ navigation }: any) => {
         </TouchableOpacity>
 
         {/* Privacy Policy */}
-        <TouchableOpacity style={styles.row}>
+        <TouchableOpacity onPress={()=>router.push("/privacy")} style={styles.row}>
           <Text style={styles.label}>Privacy Policy</Text>
           <FontAwesome name="location-arrow" size={20} color="black" />
         </TouchableOpacity>
 
         {/* Notifications */}
-        <TouchableOpacity style={styles.row}>
+        <TouchableOpacity onPress={()=>router.replace("/notifications")} style={styles.row}>
           <Text style={styles.label}>Notifications</Text>
           <FontAwesome name="location-arrow" size={20} color="black" />
         </TouchableOpacity>
