@@ -39,13 +39,12 @@ const CartDetails = () => {
         "http://10.0.2.2:5000/cart/add",
         cartItem
       );
-      if (response.status === 200) {
-        setCart((prevCart) => [...prevCart, item]);
+      console.log(response);
+      ToastAndroid.show(
+        `${item.title} has been added to your cart!`,
+        ToastAndroid.TOP
+      );
 
-        Alert.alert(
-          `${item.title} has been added to your cart!`,
-        );
-      }
     } catch (error) {
       console.error("Error adding to cart:", error);
 

@@ -66,9 +66,7 @@ const Item = () => {
       if (response.status === 200) {
         setCart((prevCart) => [...prevCart, item]);
 
-        Alert.alert(
-          `${item.title} has been added to your cart!`,
-        );
+      ToastAndroid.show(`${item.title} has been added to your cart!`,ToastAndroid.TOP)
       }
     } catch (error) {
       console.error("Error adding to cart:", error);

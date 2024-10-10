@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   FlatList,
   ScrollView,
+  ToastAndroid,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { Link, router } from "expo-router";
@@ -34,13 +35,26 @@ export default function Cart() {
 
   console.log(items);
 
+  //delete item from cart
+
+  const handleDetete = async(item:any)=>{
+    try {
+      const response = await axios.delete(`http://10.0.2.2:5000/cart/meals/${item.id}`)
+      console.log(response);
+      ToastAndroid.show(`${item.title} Delete Successfully `, ToastAndroid.TOP)
+    } catch (error) {
+      ToastAndroid.show(`${item.title} delete faild `, ToastAndroid.TOP)
+    }
+  }
+
   // Update quantity of items
   const updateQuantity = (id: any, type: any) => {
     const updatedItems = items.map((item: any) => {
       if (item._id === id) {
         if (type === "increment") {
           return { ...item, quantity: item.quantity + 1 };
-        } else if (type === "decrement" && item.quantity > 1) {
+        } else if (type === "decrement" && item.quantity > 0) {
+          handleDetete(item)
           return { ...item, quantity: item.quantity - 1 };
         }
       }
@@ -87,11 +101,13 @@ export default function Cart() {
             <View style={styles.itemContainer}>
               <Image source={{ uri: item?.image }} style={styles.itemImage} />
               <View style={styles.itemDetails}>
-               <Link href={`/cart/${item?._id}`}>
-               <Text style={styles.itemTitle}>{item.title}</Text>
-               <Text style={styles.itemSubtitle}>{item.description.slice(0, 20)}****</Text>
+               <Link  href={`/cart/${item?._id}`}>
+              <View>
+              <Text style={styles.itemTitle}>{item.title}</Text>
+              <Text style={styles.itemSubtitle}>{item.description.slice(0, 20)}.....</Text>
+              </View>
                </Link>
-                <Text style={styles.itemPrice}>${item.price}</Text>
+                <Text style={styles.itemPrice}>Price: ${item.price}</Text>
               </View>
               <View style={styles.quantityContainer}>
                 <TouchableOpacity

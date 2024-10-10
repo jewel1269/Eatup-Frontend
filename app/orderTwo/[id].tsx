@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   Modal,
   Dimensions,
+  ToastAndroid,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 
@@ -35,7 +36,7 @@ const OrderTwo = () => {
         const response = await axios.get(
           `http://10.0.2.2:5000/menu/popular/${id}`
         );
-        setOrder(response.data || []); // Set the order data
+        setOrder(response.data || []); 
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -68,7 +69,7 @@ const OrderTwo = () => {
           orderDetails
         );
         console.log("Order submitted:", response.data);
-        alert("Order placed successfully!");
+        ToastAndroid.show("Order placed successfully!", ToastAndroid.TOP);
       } catch (error) {
         console.error("Error placing order:", error);
         alert("Failed to place order. Please try again.");
@@ -95,12 +96,11 @@ const OrderTwo = () => {
         orderDetails
       );
       console.log("Order submitted (Bkash):", response.data);
-      alert("Bkash payment successful, order placed!");
+      ToastAndroid.show("Bkash payment successful, order placed!", ToastAndroid.TOP);
     } catch (error) {
       console.error("Error placing order with Bkash:", error);
-      alert("Failed to place order with Bkash. Please try again.");
+      ToastAndroid.show("Failed to place order with Bkash. Please try again.", ToastAndroid.TOP);
     } finally {
-      // Clear Bkash input and close the modal after the order is placed
       setBkashNumber("");
       setBkashPin("");
       setBkashModalVisible(false);
