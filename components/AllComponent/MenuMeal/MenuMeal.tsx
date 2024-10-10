@@ -14,52 +14,70 @@ import { AntDesign } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import axios from "axios";
 
+type MealItem = {
+  _id: string;
+  title: string;
+  description: string;
+  price: number;
+  rating: number;
+  totalOrder: number;
+  category: string;
+  image: string;
+};
 
-const BurgerCard = ({ item, index, addToCart }: any) => {
+type BurgerCardProps = {
+  item: MealItem;
+  addToCart: (item: MealItem) => void;
+};
+
+const BurgerCard = ({ item, addToCart }: BurgerCardProps) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 600,
-      delay: index * 200, 
+      delay: 200 * Math.random(), 
       useNativeDriver: true,
     }).start();
-  }, [fadeAnim]);
+  }, []);
 
   return (
     <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
-      <Link href={`/menuDetails/${item._id}`}>
-        <View style={styles.card}>
-          <View style={styles.rating}>
-            <AntDesign name="star" size={16} color="orange" />
-            <Text style={styles.ratingText}>{item.rating}</Text>
-          </View>
-          <View style={{ height: 85, width: "100%" }}>
+      <Link href={`/menuDetails/${item._id}`} asChild>
+        <TouchableOpacity activeOpacity={0.8}>
+          <View style={styles.card}>
+            <View style={styles.rating}>
+              <AntDesign name="star" size={16} color="#FFC107" />
+              <Text style={styles.ratingText}>{item.rating}</Text>
+            </View>
             <Image source={{ uri: item.image }} style={styles.image} />
+            <Text style={styles.title}>{item.title}</Text>
+            <Text style={styles.description} numberOfLines={2}>
+              {item.description}
+            </Text>
+            <Text style={styles.price}>${item.price.toFixed(2)}</Text>
+            <TouchableOpacity onPress={() => addToCart(item)} style={styles.addButton}>
+              <AntDesign name="plus" size={16} color="white" />
+            </TouchableOpacity>
           </View>
-          <Text style={styles.title}>{item.title}</Text>
-          <Text style={styles.description} numberOfLines={2}>
-            {item.description}
-          </Text>
-          <Text style={styles.price}>${item.price.toFixed(2)}</Text>
-          <TouchableOpacity onPress={()=>addToCart(item)} style={styles.addButton}>
-            <AntDesign name="plus" size={16} color="white" />
-          </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
       </Link>
     </Animated.View>
   );
 };
 
-// Main Menu Component
-const MenuMeal = () => {
-  const [data, setData] = useState<any[]>([]);
-  const [cart, setCart] = useState<any[]>([]);
+type MenuMealProps = {
+  searchQuery: string;
+};
 
-  const addToCart = async (item: any) => {
+const MenuMeal = ({ searchQuery }: MenuMealProps) => {
+  const [data, setData] = useState<MealItem[]>([]);
+  const [cart, setCart] = useState<MealItem[]>([]);
+
+  const addToCart = async (item: MealItem) => {
     const cartItem = {
-      id:item?._id,
+      id: item._id,
       title: item.title,
       description: item.description,
       price: item.price,
@@ -70,75 +88,63 @@ const MenuMeal = () => {
     };
 
     try {
-      const response = await axios.post(
-        "http://10.0.2.2:5000/cart/add",
-        cartItem
-      );
+      const response = await axios.post("http://10.0.2.2:5000/cart/add", cartItem);
       if (response.status === 200) {
         setCart((prevCart) => [...prevCart, item]);
-
-        Alert.alert(
-          `${item.title} has been added to your cart!`,
-        );
+        Alert.alert(`${item.title} has been added to your cart!`);
       }
     } catch (error) {
       console.error("Error adding to cart:", error);
-
-      ToastAndroid.show(
-        `${item.title} failed to add item to cart`,
-        ToastAndroid.SHORT
-      );
+      ToastAndroid.show(`${item.title} failed to add item to cart`, ToastAndroid.SHORT);
     }
   };
 
-  // Data Fetching from backend
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get("http://10.0.2.2:5000/menu/menumeal");
         setData(response.data);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error fetching meal data:", error);
       }
     };
-
     fetchData();
   }, []);
 
+  const filteredData = data.filter((meal) =>
+    meal.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <ScrollView
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.listContainer}
-    >
-      {data.map((item, index) => (
-        <BurgerCard key={item.id} item={item} index={index} addToCart={addToCart} />
+    <ScrollView contentContainerStyle={styles.cardsContainer}>
+      {filteredData.map((item) => (
+        <BurgerCard key={item._id} item={item} addToCart={addToCart} />
       ))}
     </ScrollView>
   );
 };
 
-// Styles for the Menu and Burger Card components
 const styles = StyleSheet.create({
-  container: {
-    marginBottom: 20,
-  },
-  listContainer: {
-    paddingHorizontal: 16,
+  cardsContainer: {
+    paddingHorizontal: 10,
+    paddingTop: 10,
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
   },
+  container: {
+    width: "48%",
+    marginBottom: 20,
+  },
   card: {
-    backgroundColor: "white",
+    backgroundColor: "#fff",
     borderRadius: 10,
     padding: 15,
-    width: 185,
-    height: 250,
+    elevation: 5,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
-    shadowRadius: 1,
-    elevation: 7,
+    shadowRadius: 4,
   },
   rating: {
     flexDirection: "row",
@@ -147,28 +153,28 @@ const styles = StyleSheet.create({
   },
   ratingText: {
     marginLeft: 5,
-    color: "black",
-    fontWeight: "bold",
+    fontSize: 14,
+    color: "#333",
   },
   image: {
     width: "100%",
-    height: "100%",
-    resizeMode: "cover",
+    height: 120,
+    borderRadius: 10,
     marginBottom: 10,
   },
   title: {
     fontSize: 16,
     fontWeight: "bold",
     color: "black",
-    marginBottom: 10,
+    marginBottom: 5,
   },
   description: {
-    fontSize: 12,
-    color: "gray",
-    marginTop: -10,
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 5,
   },
   price: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
     color: "red",
     marginBottom: 10,
@@ -176,11 +182,11 @@ const styles = StyleSheet.create({
   addButton: {
     backgroundColor: "red",
     padding: 8,
-    marginTop: -34,
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
     alignSelf: "flex-end",
+    marginTop: -34,
   },
 });
 

@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import axios from "axios";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 
 
 const MenuItem = ({ item, addToCart }: any) => (
@@ -27,9 +27,11 @@ const MenuItem = ({ item, addToCart }: any) => (
           <Text style={styles.orders}>Sold: {item.totalOrder}</Text>
         </View>
         <View style={styles.orderBtn}>
-          <TouchableOpacity style={styles.button}>
+          <Link href={`/orderTwo/${item?._id}`}>
+          <View  style={styles.button}>
             <Text style={styles.buttonText}>Order</Text>
-          </TouchableOpacity>
+          </View>
+          </Link>
           <TouchableOpacity onPress={() => addToCart(item)} style={styles.addButton}>
             <AntDesign name="plus" size={16} color="white" />
           </TouchableOpacity>
