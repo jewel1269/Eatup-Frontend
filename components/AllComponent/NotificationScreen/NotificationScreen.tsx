@@ -106,8 +106,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 15,
     height: 55,
+    borderColor: "#007bff", 
+    borderWidth: 1,
+    borderRadius: 25,
     backgroundColor: '#fff',
-    borderRadius: 8,
+
     marginVertical: 5,
     marginHorizontal: 10,
     shadowColor: '#000',

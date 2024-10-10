@@ -158,10 +158,12 @@ const styles = StyleSheet.create({
   itemContainer: {
     flexDirection: "row",
     alignItems: "center",
+    borderColor: "#007bff", 
+    borderWidth: 1,
+    borderRadius: 25,
     backgroundColor: "#f9f9f9",
     padding: 10,
     marginVertical: 8,
-    borderRadius: 10,
   },
   itemImage: {
     width: 60,

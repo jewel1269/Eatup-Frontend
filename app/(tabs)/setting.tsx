@@ -1,6 +1,6 @@
 import { auth } from "@/components/AllComponent/Firebase/Firebase";
 import useAuth from "@/components/AllComponent/useAuth/useAuth";
-import { Feather, FontAwesome, Ionicons } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import { router, useRouter } from "expo-router";
 import { signOut } from "firebase/auth";
 import React, { useState } from "react";
@@ -13,15 +13,15 @@ import {
   TextInput,
   ToastAndroid,
   Alert,
-  Button, 
+  Button,
 } from "react-native";
 
 const SettingsScreen = ({ navigation }: any) => {
   const { user } = useAuth();
   const router = useRouter();
 
-  const [isSearching, setIsSearching] = useState(false); 
-  const [searchQuery, setSearchQuery] = useState(""); 
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleProfile = () => {
     router.push("/profile");
@@ -31,17 +31,15 @@ const SettingsScreen = ({ navigation }: any) => {
     router.back();
   };
 
-  // Handle search icon click
   const toggleSearch = () => {
     setIsSearching(!isSearching);
-    setSearchQuery(""); 
+    setSearchQuery("");
   };
 
-  // Function to confirm log out
   const confirmLogOut = () => {
     Alert.alert(
-      "Log Out", 
-      "Are you sure you want to log out?", 
+      "Log Out",
+      "Are you sure you want to log out?",
       [
         {
           text: "Cancel",
@@ -50,14 +48,13 @@ const SettingsScreen = ({ navigation }: any) => {
         },
         {
           text: "Yes",
-          onPress: handleLogOut, 
+          onPress: handleLogOut,
         },
       ],
       { cancelable: false }
     );
   };
 
-  // Actual logout function
   const handleLogOut = () => {
     signOut(auth)
       .then(() => {
@@ -75,11 +72,11 @@ const SettingsScreen = ({ navigation }: any) => {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBack}>
-          <Ionicons name="arrow-back-outline" size={24} color="black" />
+          <Ionicons name="arrow-back-outline" size={24} color="white" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Settings</Text>
         <TouchableOpacity onPress={toggleSearch}>
-          <Feather name="search" size={24} color="black" />
+          <Feather name="search" size={24} color="white" />
         </TouchableOpacity>
       </View>
 
@@ -95,7 +92,9 @@ const SettingsScreen = ({ navigation }: any) => {
         </View>
       )}
 
-      <ScrollView>
+      <ScrollView style={{
+        paddingHorizontal:10
+      }}>
         {/* Email Section */}
         <TouchableOpacity style={styles.row}>
           <Text style={styles.label}>Email</Text>
@@ -105,41 +104,32 @@ const SettingsScreen = ({ navigation }: any) => {
         {/* About You */}
         <TouchableOpacity onPress={handleProfile} style={styles.row}>
           <Text style={styles.label}>About You</Text>
-          <FontAwesome name="location-arrow" size={20} color="black" />
+          <Ionicons name="person-outline" size={20} color="black" />
         </TouchableOpacity>
 
         {/* Privacy Policy */}
-        <TouchableOpacity onPress={()=>router.push("/privacy")} style={styles.row}>
+        <TouchableOpacity onPress={() => router.push("/privacy")} style={styles.row}>
           <Text style={styles.label}>Privacy Policy</Text>
-          <FontAwesome name="location-arrow" size={20} color="black" />
+          <Ionicons name="shield-outline" size={20} color="black" />
         </TouchableOpacity>
 
         {/* Notifications */}
-        <TouchableOpacity onPress={()=>router.replace("/notifications")} style={styles.row}>
+        <TouchableOpacity onPress={() => router.replace("/notifications")} style={styles.row}>
           <Text style={styles.label}>Notifications</Text>
-          <FontAwesome name="location-arrow" size={20} color="black" />
+          <Ionicons name="notifications-outline" size={20} color="black" />
         </TouchableOpacity>
 
         {/* Profile Visibility */}
-        <TouchableOpacity style={styles.row}>
-          <Text style={styles.label}>Profile Visibility</Text>
-          <FontAwesome name="location-arrow" size={20} color="black" />
-        </TouchableOpacity>
-
-        {/* Blocked Users */}
-        <TouchableOpacity style={styles.row}>
-          <Text style={styles.label}>Blocked Users</Text>
-          <FontAwesome name="location-arrow" size={20} color="black" />
+        <TouchableOpacity onPress={() => router.push("/allOrder")} style={styles.row}>
+          <Text style={styles.label}>All Orders</Text>
+          <Ionicons name="list-outline" size={20} color="black" />
         </TouchableOpacity>
 
         {/* Log Out */}
-        <TouchableOpacity style={styles.logoutButton}>
-            <View style={{
-                borderRadius:20,
-                width:120,
-            }}>
-            <Button onPress={confirmLogOut} color={"#ff4d4d"}  title="Log Out"/>
-            </View>
+        <TouchableOpacity style={styles.logoutButton} activeOpacity={0.7}>
+          <View style={styles.logoutButtonStyle}>
+            <Button onPress={confirmLogOut} color={"gray"} title="Log Out" />
+          </View>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -149,58 +139,72 @@ const SettingsScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#f0f8ff", 
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 15,
-    marginBottom: 20,
+    paddingVertical: 10,
+    backgroundColor: "#007bff", 
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: "bold",
+    color: "#fff",
   },
   searchContainer: {
     paddingHorizontal: 15,
     paddingBottom: 10,
+    marginTop:10
   },
   searchInput: {
     height: 40,
-    borderColor: "#ccc",
+    borderColor: "#007bff", 
     borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    backgroundColor: "#f9f9f9",
+    borderRadius: 25,
+    paddingHorizontal: 15,
+    backgroundColor: "#e6f0ff", 
   },
   row: {
     flexDirection: "row",
+    borderColor: "#007bff", 
+    borderWidth: 1,
+    borderRadius: 25,
     justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: 15,
     paddingHorizontal: 20,
+    backgroundColor: "#ffffff",
     borderBottomWidth: 1,
     borderBottomColor: "#f4f4f4",
+
+    marginVertical: 5, 
   },
   label: {
     fontSize: 16,
+    fontWeight: "500",
   },
   email: {
     fontSize: 16,
-    color: "#007bff",
+    color: "#007bff", 
   },
   logoutButton: {
     paddingVertical: 10,
     paddingHorizontal: 12,
     alignItems: "center",
     borderTopWidth: 1,
-    borderRadius:10,
     borderTopColor: "#f4f4f4",
   },
-  logoutText: {
-    fontSize: 16,
-    color: "red",
+  logoutButtonStyle: {
+    borderRadius: 20,
+    overflow: "hidden", 
+    backgroundColor: "#ff4d4d", 
+    width: "80%", 
+    alignSelf: "center", 
   },
 });
 
