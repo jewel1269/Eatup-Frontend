@@ -8,11 +8,15 @@ import {
   TouchableOpacity,
   ToastAndroid,
   Platform,
+  Alert,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import axios from "axios";
+import SpinningCircle from "../SpinningCircle/SpinningCircle";
+import useAuth from "../useAuth/useAuth";
 
+// Component for rendering a burger card
 const BurgerCard = ({ item, addToCart }: any) => {
   return (
     <View style={styles.container}>
@@ -41,18 +45,19 @@ const BurgerCard = ({ item, addToCart }: any) => {
 
 const BurgerList = () => {
   const [data, setData] = useState<any[]>([]);
-  const [cart, setCart] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true); // State for loading
+  const {user}=useAuth()
 
   // Data Fetching from backend
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          "http://10.0.2.2:5000/menu/burgerList"
-        );
+        const response = await axios.get("http://10.0.2.2:5000/menu/burgerList");
         setData(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false); // Set loading to false after data is fetched
       }
     };
 
@@ -61,7 +66,8 @@ const BurgerList = () => {
 
   const addToCart = async (item: any) => {
     const cartItem = {
-      id:item?._id,
+      id: item?._id,
+      userEmail:user.email,
       title: item.title,
       description: item.description,
       price: item.price,
@@ -72,23 +78,34 @@ const BurgerList = () => {
     };
 
     try {
-      const response = await axios.post(
-        "http://10.0.2.2:5000/cart/add",
-        cartItem
-      );
-      ToastAndroid.show(
-        `${item.title} has been added to your cart!`,
-        ToastAndroid.TOP
-      );
+      await axios.post("http://10.0.2.2:5000/cart/add", cartItem);
+
+      if (Platform.OS === "android") {
+        ToastAndroid.show(
+          `${item.title} has been added to your cart!`,
+          ToastAndroid.TOP
+        );
+      } else {
+        Alert.alert("Success", `${item.title} has been added to your cart!`);
+      }
     } catch (error) {
       console.error("Error adding to cart:", error);
 
-      ToastAndroid.show(
-        `${item.title} failed to add item to cart`,
-        ToastAndroid.SHORT
-      );
+      if (Platform.OS === "android") {
+        ToastAndroid.show(
+          `${item.title} failed to add item to cart`,
+          ToastAndroid.SHORT
+        );
+      } else {
+        Alert.alert("Error", `Failed to add ${item.title} to cart.`);
+      }
     }
   };
+
+  if (loading) {
+    return <SpinningCircle />;
+  }
+
   return (
     <ScrollView
       horizontal

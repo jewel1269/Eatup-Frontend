@@ -1,3 +1,4 @@
+import SpinningCircle from "@/components/AllComponent/SpinningCircle/SpinningCircle";
 import useAuth from "@/components/AllComponent/useAuth/useAuth";
 import axios from "axios";
 import { router, useLocalSearchParams } from "expo-router";
@@ -60,7 +61,7 @@ const OrderTwo = () => {
         paymentMethod: "cash",
         orderItems:order,
         userEmail: user?.email,
-        status:"Pendnig"
+        status:"Pending"
       };
 
       try {
@@ -70,6 +71,7 @@ const OrderTwo = () => {
         );
         console.log("Order submitted:", response.data);
         ToastAndroid.show("Order placed successfully!", ToastAndroid.TOP);
+        router.push("/allOrder")
       } catch (error) {
         console.error("Error placing order:", error);
         alert("Failed to place order. Please try again.");
@@ -97,9 +99,11 @@ const OrderTwo = () => {
       );
       console.log("Order submitted (Bkash):", response.data);
       ToastAndroid.show("Bkash payment successful, order placed!", ToastAndroid.TOP);
+      router.push("/allOrder")
     } catch (error) {
       console.error("Error placing order with Bkash:", error);
       ToastAndroid.show("Failed to place order with Bkash. Please try again.", ToastAndroid.TOP);
+      
     } finally {
       setBkashNumber("");
       setBkashPin("");
@@ -108,7 +112,7 @@ const OrderTwo = () => {
   };
 
   if (loading) {
-    return <Text>Loading...</Text>;
+    return <SpinningCircle/>
   }
 
   if (error) {

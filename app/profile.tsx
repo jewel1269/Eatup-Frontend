@@ -97,8 +97,8 @@ export default function ProfileScreen() {
           <Text style={styles.value}>{userData?.address}</Text>
         </View>
         <View style={styles.infoItem}>
-          <Text style={styles.label}>Employer</Text>
-          <Text style={styles.value}>Software Engineer</Text>
+          <Text style={styles.label}>Type</Text>
+          <Text style={styles.value}>Customer</Text>
         </View>
         <View style={styles.infoItem}>
           <Text style={styles.label}>BD Citizen</Text>

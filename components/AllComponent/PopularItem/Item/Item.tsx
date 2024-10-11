@@ -12,6 +12,8 @@ import {
 import { AntDesign } from "@expo/vector-icons";
 import axios from "axios";
 import { Link, router } from "expo-router";
+import SpinningCircle from "../../SpinningCircle/SpinningCircle";
+import useAuth from "../../useAuth/useAuth";
 
 
 const MenuItem = ({ item, addToCart }: any) => (
@@ -45,10 +47,13 @@ const MenuItem = ({ item, addToCart }: any) => (
 const Item = () => {
   const [data, setData] = useState<any[]>([]);
   const [cart, setCart] = useState<any[]>([]);
+  const {user}=useAuth()
+
 
   const addToCart = async (item: any) => {
     const cartItem = {
       id:item?._id,
+      userEmail:user.email,
       title: item.title,
       description: item.description,
       price: item.price,
@@ -93,6 +98,9 @@ const Item = () => {
 
     fetchData();
   }, []);
+
+  
+
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.grid}>

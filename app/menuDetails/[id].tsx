@@ -13,6 +13,8 @@ import {
   ToastAndroid,
 } from "react-native";
 import LottieView from "lottie-react-native";
+import SpinningCircle from "@/components/AllComponent/SpinningCircle/SpinningCircle";
+import useAuth from "@/components/AllComponent/useAuth/useAuth";
 
 const DetailsPage = () => {
   const { id } = useLocalSearchParams<any>();
@@ -21,10 +23,11 @@ const DetailsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [cart, setCart] = useState<any[]>([]);
-
+  const {user}=useAuth()
   const addToCart = async (item: any) => {
     const cartItem = {
       id: item?._id,
+      userEmail: user.email,
       title: item.title,
       description: item.description,
       price: item.price,
@@ -80,16 +83,7 @@ const DetailsPage = () => {
 
   // Show Lottie animation loader when data is being fetched
   if (loading) {
-    return (
-      <View style={styles.loaderContainer}>
-        <LottieView
-          source={require("../../assets/loader/Loader2.json")}
-          autoPlay
-          loop
-          style={styles.lottie}
-        />
-      </View>
-    );
+    return <SpinningCircle/>
   }
 
   if (error || !product) {
@@ -137,11 +131,13 @@ const DetailsPage = () => {
 
         <Text style={styles.descriptionText}>{product.description}</Text>
         <Text style={styles.ingredients}>• {product.category}</Text>
+        <Text style={{fontSize:16, fontWeight:"bold", marginTop:-5}}>•Price: ${product.price.toFixed(2)}</Text>
+
       </View>
 
       <TouchableOpacity onPress={()=>addToCart(product)} style={styles.addToCartButton}>
         <Text style={styles.addToCartText}>
-          Add To Cart - ${product.price.toFixed(2)}
+          Add To Cart 
         </Text>
       </TouchableOpacity>
     </ScrollView>
@@ -242,8 +238,10 @@ const styles = StyleSheet.create({
   },
   addToCartButton: {
     backgroundColor: "#FF6347",
-    paddingVertical: 16,
+    paddingVertical: 10,
     borderRadius: 30,
+    width:"50%",
+    alignSelf:"center",
     marginHorizontal: 16,
     marginBottom: 20,
   },

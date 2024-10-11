@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,49 +8,86 @@ import {
   Image,
   Dimensions,
 } from "react-native";
-import Icon from "react-native-vector-icons/Feather"; // Ensure this is installed
-import { useNavigation } from '@react-navigation/native';
+import Icon from "react-native-vector-icons/Feather";
+import { useNavigation } from "@react-navigation/native";
+import useAuth from "../useAuth/useAuth";
+import axios from "axios";
+import { Link } from "expo-router";
 
 const { width } = Dimensions.get("window");
 
 const OrderScreen = () => {
-  const navigation = useNavigation(); // Use navigation hook
+  const navigation = useNavigation();
   const [activeTab, setActiveTab] = useState("all");
+  const [orders, setOrders] = useState<any[]>([]); // Initialize as an empty array
+  const { user } = useAuth();
+  const email = user?.email;
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await axios.get(
+          `http://10.0.2.2:5000/order/orderWithEmail?email=${email}`
+        );
+
+        if (response && response.data) {
+          setOrders(response.data);
+        } else {
+          console.log("User not found");
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
+
+    fetchUser();
+  }, [email]);
 
   const tabs = ["all", "pending", "complete"];
 
-  const orders = [
-    { id: "1", title: "Angga Big Park", status: "pending", time: "10 hours", price: "$49,509", date: "12 January 2024" },
-    { id: "2", title: "Angga Big Park", status: "pending", time: "10 hours", price: "$49,509", date: "12 January 2024" },
-    { id: "3", title: "Angga Big Park", status: "complete", time: "10 hours", price: "$49,509", date: "12 January 2024" },
-    { id: "4", title: "Angga Big Park", status: "complete", time: "10 hours", price: "$49,509", date: "12 January 2024" },
-    { id: "5", title: "Angga Big Park", status: "failed", time: "10 hours", price: "$49,509", date: "12 January 2024" },
-  ];
-
-  const renderOrderItem = ({ item }:any) => {
-    const statusColors:any = {
-      pending: "#FFA500",  // Orange for pending
+  const renderOrderItem = ({ item }: any) => {
+    const statusColors: any = {
+      pending: "#FFA500", // Orange for pending
       complete: "#00C853", // Green for complete
-      failed: "#FF5252",   // Red for failed
+      failed: "#FF5252", // Red for failed
     };
 
     return (
       <View style={styles.orderItem}>
         <Image
-          source={{ uri: "https://via.placeholder.com/100x100" }}
+          source={
+            item?.orderItems[0]?.image
+              ? { uri: item.orderItems[0].image } // Use the URI if available
+              : {
+                  uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQz4EwRe31j7RxW01OfOPkZ5PD3a8cDvff4Hw&s",
+                } // Fallback image
+          }
           style={styles.orderImage}
         />
+
         <View style={styles.orderDetails}>
-          <Text style={styles.orderTitle}>{item.title}</Text>
-          <View style={styles.orderInfo}>
-            <Text style={styles.orderTime}>{item.time}</Text>
-            <Text style={styles.orderPrice}>{item.price}</Text>
-          </View>
-          <Text style={styles.orderDate}>{item.date}</Text>
+          <Link href={`/summary/${item?._id}`}>
+            <Text style={styles.orderTitle}>
+              {item.orderItems[0]?.title || "Untitled"}
+            </Text>
+            <View style={styles.orderInfo}>
+              <Text style={styles.orderPrice}>Price: ${item.totalPrice}</Text>
+            </View>
+          </Link>
+          <Text style={styles.orderDate}>{item.orderDate.slice(0, 10)}</Text>
         </View>
+
+        <Text style={{ fontWeight: "bold", marginRight: 6 }}>
+          {item.paymentMethod}
+        </Text>
         <View style={styles.statusContainer}>
           <View style={styles.verticalLine} />
-          <View style={[styles.orderStatus, { backgroundColor: statusColors[item.status] }]}>
+          <View
+            style={[
+              styles.orderStatus,
+              { backgroundColor: statusColors[item.status.toLowerCase()] },
+            ]}
+          >
             <Text style={styles.statusText}>{item.status}</Text>
           </View>
         </View>
@@ -75,15 +112,27 @@ const OrderScreen = () => {
             style={[styles.tabButton, activeTab === tab && styles.activeTab]}
             onPress={() => setActiveTab(tab)}
           >
-            <Text style={activeTab === tab ? styles.activeTabText : styles.tabText}>{tab}</Text>
+            <Text
+              style={activeTab === tab ? styles.activeTabText : styles.tabText}
+            >
+              {tab}
+            </Text>
           </TouchableOpacity>
         ))}
       </View>
 
       <FlatList
-        data={orders.filter(order => activeTab === "all" || order.status === activeTab)}
+        data={
+          orders
+            ? orders.filter(
+                (order: any) =>
+                  activeTab === "all" ||
+                  order.status.toLowerCase() === activeTab
+              )
+            : []
+        }
         renderItem={renderOrderItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id}
         style={styles.orderList}
       />
     </View>
@@ -96,23 +145,24 @@ const styles = StyleSheet.create({
     backgroundColor: "#F9FAFB",
     paddingHorizontal: 16,
   },
+  orderInfo: {},
   headerContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginTop: 6,
-    backgroundColor: "#1E88E5", // Custom header background color
+    backgroundColor: "#1E88E5",
     paddingVertical: 6,
     paddingHorizontal: 24,
     borderBottomLeftRadius: 16,
     borderBottomRightRadius: 16,
-    elevation: 4, // Adds a shadow effect
+    elevation: 4,
   },
   headerText: {
     fontSize: 24,
     fontWeight: "bold",
     color: "#FFF",
-    textAlign: "center", // Centered title
+    textAlign: "center",
     flex: 1,
   },
   tabsContainer: {
@@ -126,11 +176,11 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     backgroundColor: "#E0E0E0",
     borderWidth: 1,
-    borderColor: "#ccc", // Custom border color
+    borderColor: "#ccc",
   },
   activeTab: {
-    backgroundColor: "red",
-    borderColor: "green", // Match border with active tab
+    backgroundColor: "green",
+    borderColor: "green",
   },
   tabText: {
     color: "#000",
@@ -144,16 +194,19 @@ const styles = StyleSheet.create({
   },
   orderItem: {
     flexDirection: "row",
-    backgroundColor: "#FFF",
+    backgroundColor: "#F5F5F5",
     borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#D3D3D3",
     padding: 16,
+    height: 70,
     marginBottom: 16,
     alignItems: "center",
     justifyContent: "space-between",
-    elevation: 2, // Shadow for order items
+    elevation: 2,
   },
   orderImage: {
-    width: 64,
+    width: 70,
     height: 64,
     borderRadius: 8,
   },
@@ -165,14 +218,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: "#1F1F1F",
-  },
-  orderInfo: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginVertical: 4,
-  },
-  orderTime: {
-    color: "#666",
   },
   orderPrice: {
     color: "#000",
@@ -189,12 +234,12 @@ const styles = StyleSheet.create({
     width: 2,
     height: "100%",
     backgroundColor: "red",
-    marginRight: 8, 
+    marginRight: 8,
   },
   orderStatus: {
-    paddingVertical: 8,
+    paddingVertical: 6,
     paddingHorizontal: 12,
-    borderRadius: 16,
+    borderRadius: 22,
   },
   statusText: {
     color: "#FFF",

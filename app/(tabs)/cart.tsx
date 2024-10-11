@@ -6,81 +6,82 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
-  ScrollView,
   ToastAndroid,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { Link, router } from "expo-router";
 import axios from "axios";
+import useAuth from "@/components/AllComponent/useAuth/useAuth";
 
 export default function Cart() {
-  // Example data (you can replace this with your actual data)
-  const [items, setItems] = useState<any>([]);
+  const [items, setItems] = useState<any[]>([]);
+  const { user } = useAuth();
+  const email = user?.email; 
 
-  //fetchData
+  // Fetch cart items from backend
   useEffect(() => {
     const fetchData = async () => {
+    
+
       try {
-        const response = await axios.get(
-          "http://10.0.2.2:5000/cart/meals"
-        );
+        const response = await axios.get(`http://10.0.2.2:5000/cart/meals?email=${email}`);
         setItems(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
+        ToastAndroid.show("Error fetching cart items", ToastAndroid.SHORT);
       }
     };
 
     fetchData();
-  }, []);
+  }, [email]); // Add email as a dependency to re-fetch if it changes
 
-  console.log(items);
-
-  //delete item from cart
-
-  const handleDetete = async(item:any)=>{
+  // Handle delete item
+  const handleDelete = async (item: any) => {
     try {
-      const response = await axios.delete(`http://10.0.2.2:5000/cart/meals/${item.id}`)
-      console.log(response);
-      ToastAndroid.show(`${item.title} Delete Successfully `, ToastAndroid.TOP)
+      await axios.delete(`http://10.0.2.2:5000/cart/meals/${item._id}`);
+      setItems(prevItems => prevItems.filter((i) => i._id !== item._id)); 
+      ToastAndroid.show(`${item.title} deleted successfully`, ToastAndroid.SHORT);
     } catch (error) {
-      ToastAndroid.show(`${item.title} delete faild `, ToastAndroid.TOP)
+      console.error("Failed to delete item:", error);
+      ToastAndroid.show(`${item.title} failed to delete`, ToastAndroid.SHORT);
     }
-  }
+  };
 
   // Update quantity of items
-  const updateQuantity = (id: any, type: any) => {
-    const updatedItems = items.map((item: any) => {
-      if (item._id === id) {
-        if (type === "increment") {
-          return { ...item, quantity: item.quantity + 1 };
-        } else if (type === "decrement" && item.quantity > 0) {
-          handleDetete(item)
-          return { ...item, quantity: item.quantity - 1 };
+  const updateQuantity = (id: string, type: "increment" | "decrement") => {
+    setItems(prevItems => 
+      prevItems.map(item => {
+        if (item._id === id) {
+          if (type === "increment") {
+            return { ...item, quantity: item.quantity + 1 };
+          } else if (type === "decrement") {
+            if (item.quantity > 1) {
+              return { ...item, quantity: item.quantity - 1 };
+            } else {
+              handleDelete(item);
+            }
+          }
         }
-      }
-      return item;
-    });
-    setItems(updatedItems);
+        return item;
+      })
+    );
   };
 
   // Calculate total
-  const subTotal = items.reduce(
-    (total: any, item: any) => total + item.price * item.quantity,
-    0
-  );
-  const deliveryCharge = 10;
+  const subTotal = items.reduce((total, item) => total + item.price * item.quantity, 0);
+  const deliveryCharge = subTotal > 50 ? 10 : 0;
   const discount = subTotal > 100 ? 10 : 0;
   const total = subTotal + deliveryCharge - discount;
 
-  // back to pevious page
+  // Navigate back
   const handleBack = () => {
     router.back();
   };
 
-  //hhandleOrder
-  const handleOrder =()=>{
-    router.push("/order")
-  }
+  // Navigate to order page
+  const handleOrder = () => {
+    router.push("/order");
+  };
 
   return (
     <View style={styles.container}>
@@ -89,41 +90,41 @@ export default function Cart() {
         <TouchableOpacity onPress={handleBack}>
           <AntDesign name="arrowleft" size={24} color="black" />
         </TouchableOpacity>
-        <Text style={styles.headerText}>Cart details</Text>
+        <Text style={styles.headerText}>Cart Details</Text>
       </View>
 
-      {/* Order Items List */}
+      {/* Cart Items List */}
       <FlatList
         data={items}
-        keyExtractor={(item) => item._id} 
+        keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
-          <ScrollView>
-            <View style={styles.itemContainer}>
-              <Image source={{ uri: item?.image }} style={styles.itemImage} />
-              <View style={styles.itemDetails}>
-               <Link  href={`/cart/${item?._id}`}>
-              <View>
-              <Text style={styles.itemTitle}>{item.title}</Text>
-              <Text style={styles.itemSubtitle}>{item.description.slice(0, 20)}.....</Text>
-              </View>
-               </Link>
-                <Text style={styles.itemPrice}>Price: ${item.price}</Text>
-              </View>
-              <View style={styles.quantityContainer}>
-                <TouchableOpacity
-                  onPress={() => updateQuantity(item._id, "decrement")}
-                >
-                  <AntDesign name="minuscircle" size={24} color="red" />
-                </TouchableOpacity>
-                <Text style={styles.quantityText}>{item.quantity}</Text>
-                <TouchableOpacity
-                  onPress={() => updateQuantity(item._id, "increment")} 
-                >
-                  <AntDesign name="pluscircle" size={24} color="red" />
-                </TouchableOpacity>
-              </View>
+          <View style={styles.itemContainer}>
+            <Image source={{ uri: item.image }} style={styles.itemImage} />
+            <View style={styles.itemDetails}>
+              <Link href={`/cart/${item._id}`}>
+                <View>
+                  <Text style={styles.itemTitle}>{item.title}</Text>
+                  <Text style={styles.itemSubtitle}>
+                    {item.description.slice(0, 20)}...
+                  </Text>
+                </View>
+              </Link>
+              <Text style={styles.itemPrice}>Price: ${item.price}</Text>
             </View>
-          </ScrollView>
+            <View style={styles.quantityContainer}>
+              <TouchableOpacity
+                onPress={() => updateQuantity(item._id, "decrement")}
+              >
+                <AntDesign name="minuscircle" size={24} color="red" />
+              </TouchableOpacity>
+              <Text style={styles.quantityText}>{item.quantity}</Text>
+              <TouchableOpacity
+                onPress={() => updateQuantity(item._id, "increment")}
+              >
+                <AntDesign name="pluscircle" size={24} color="red" />
+              </TouchableOpacity>
+            </View>
+          </View>
         )}
       />
 
@@ -131,19 +132,19 @@ export default function Cart() {
       <View style={styles.summaryContainer}>
         <View style={styles.summaryRow}>
           <Text style={styles.summaryText}>Sub-Total</Text>
-          <Text style={styles.summaryText}>${subTotal}</Text>
+          <Text style={styles.summaryText}>${subTotal.toFixed(2)}</Text>
         </View>
         <View style={styles.summaryRow}>
           <Text style={styles.summaryText}>Delivery Charge</Text>
-          <Text style={styles.summaryText}>${deliveryCharge}</Text>
+          <Text style={styles.summaryText}>${deliveryCharge.toFixed(2)}</Text>
         </View>
         <View style={styles.summaryRow}>
           <Text style={styles.summaryText}>Discount</Text>
-          <Text style={styles.summaryText}>${discount}</Text>
+          <Text style={styles.summaryText}>${discount.toFixed(2)}</Text>
         </View>
         <View style={styles.summaryRow}>
           <Text style={styles.totalText}>Total</Text>
-          <Text style={styles.totalText}>${total}</Text>
+          <Text style={styles.totalText}>${total.toFixed(2)}</Text>
         </View>
       </View>
 
@@ -174,7 +175,7 @@ const styles = StyleSheet.create({
   itemContainer: {
     flexDirection: "row",
     alignItems: "center",
-    borderColor: "#007bff", 
+    borderColor: "#007bff",
     borderWidth: 1,
     borderRadius: 25,
     backgroundColor: "#f9f9f9",
@@ -215,9 +216,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     padding: 10,
     borderWidth: 1,
-    shadowOpacity: 3,
-    shadowRadius: 10,
-    shadowColor: "red",
     borderRadius: 10,
   },
   summaryRow: {
@@ -226,17 +224,15 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   summaryText: {
-    color: "black",
     fontSize: 16,
   },
   totalText: {
-    color: "black",
     fontSize: 18,
     fontWeight: "bold",
   },
   orderButton: {
     backgroundColor: "#ff4d4d",
-    paddingVertical: 8,
+    paddingVertical: 10,
     alignItems: "center",
     borderRadius: 10,
     marginVertical: 20,

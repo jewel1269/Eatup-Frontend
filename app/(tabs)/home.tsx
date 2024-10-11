@@ -1,4 +1,11 @@
-import { View, Text, ActivityIndicator, StyleSheet, Image, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  StyleSheet,
+  Image,
+  ScrollView,
+} from "react-native";
 import { Entypo, FontAwesome5, FontAwesome6 } from "@expo/vector-icons";
 import Search from "@/components/AllComponent/Search/Search";
 import HeroSlider from "@/components/AllComponent/HeroSection/HeroSection";
@@ -11,44 +18,45 @@ import useAuth from "@/components/AllComponent/useAuth/useAuth";
 import axios from "axios";
 
 export default function HomeScreen() {
-
-  const [userData, setUserData] = useState<any>()
-  const {user} = useAuth()
+  const [userData, setUserData] = useState<any>();
+  const { user } = useAuth();
   const email = user?.email;
 
-   useEffect(() => {
+  useEffect(() => {
     // Define an inner async function
     const fetchUser = async () => {
       try {
-        const response = await axios.get(`http://10.0.2.2:5000/users/users?email=${email}`);
-        
+        const response = await axios.get(
+          `http://10.0.2.2:5000/users/users?email=${email}`
+        );
+
         if (response && response.data) {
-          console.log('User data:', response.data);
-          setUserData(response.data)
+          console.log("User data:", response.data);
+          setUserData(response.data);
         } else {
-          console.log('User not found');
+          console.log("User not found");
         }
       } catch (error) {
-        console.error('Error fetching user:', error);
+        console.error("Error fetching user:", error);
       }
     };
 
     // Call the async function
     fetchUser();
-  }, [email]); 
+  }, [email]);
 
-  
   return (
     <View style={styles.container}>
       {/* Header section */}
       <View style={styles.header}>
         <View style={styles.iconContainer}>
-         <Image style={{
-          height:45,
-          width:100,
-          
-          
-         }} source={require("../../assets/images/Logo/logo1.png-removebg-preview.png")}/>
+          <Image
+            style={{
+              height: 45,
+              width: 100,
+            }}
+            source={require("../../assets/images/Logo/logo1.png-removebg-preview.png")}
+          />
         </View>
         <View style={styles.location}>
           <Entypo
@@ -59,19 +67,25 @@ export default function HomeScreen() {
             size={24}
             color="black"
           />
-          <Text style={styles.locationText}>{userData?.address}</Text>
+        <Link href={"/updateProfile"}>
+        <Text style={styles.locationText}>
+            {userData?.address ? userData.address : "Location not available"}
+          </Text>
+        </Link>
         </View>
-       <Link style={{
-            marginRight:8,
-       }} href={"/profile"}>
-       <View  style={styles.imageContainer}>
-          <Image
-          
-            style={styles.image}
-            source={require("../../assets/images/profile.webp")}
-          />
-        </View>
-       </Link>
+        <Link
+          style={{
+            marginRight: 8,
+          }}
+          href={"/profile"}
+        >
+          <View style={styles.imageContainer}>
+            <Image
+              style={styles.image}
+              source={require("../../assets/images/profile.webp")}
+            />
+          </View>
+        </Link>
       </View>
 
       {/* Scrollable content */}
@@ -108,8 +122,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   iconContainer: {
-   marginLeft:-7
-    
+    marginLeft: -7,
   },
   imageContainer: {
     borderWidth: 1,
@@ -124,10 +137,11 @@ const styles = StyleSheet.create({
   location: {
     flexDirection: "row",
     alignItems: "center",
-    marginRight: 10,
+    marginRight: 15,
   },
   locationText: {
-    marginLeft: 5,
+    marginLeft: 10,
+    marginTop:5,
     color: "black",
   },
   contentPlaceholder: {

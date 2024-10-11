@@ -7,12 +7,13 @@ import {
   Image,
   TouchableOpacity,
   Animated,
-  Alert,
   ToastAndroid,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import axios from "axios";
+import SpinningCircle from "../SpinningCircle/SpinningCircle";
+import useAuth from "../useAuth/useAuth";
 
 type MealItem = {
   _id: string;
@@ -37,7 +38,7 @@ const BurgerCard = ({ item, addToCart }: BurgerCardProps) => {
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 600,
-      delay: 200 * Math.random(), 
+      delay: 200 * Math.random(),
       useNativeDriver: true,
     }).start();
   }, []);
@@ -74,10 +75,13 @@ type MenuMealProps = {
 const MenuMeal = ({ searchQuery }: MenuMealProps) => {
   const [data, setData] = useState<MealItem[]>([]);
   const [cart, setCart] = useState<MealItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const {user}=useAuth()
 
   const addToCart = async (item: MealItem) => {
     const cartItem = {
       id: item._id,
+      userEmail:user.email,
       title: item.title,
       description: item.description,
       price: item.price,
@@ -89,24 +93,25 @@ const MenuMeal = ({ searchQuery }: MenuMealProps) => {
 
     try {
       const response = await axios.post("http://10.0.2.2:5000/cart/add", cartItem);
-      console.log(response);
       ToastAndroid.show(
         `${item.title} has been added to your cart!`,
         ToastAndroid.TOP
       );
     } catch (error) {
-      console.error("Error adding to cart:", error);
       ToastAndroid.show(`${item.title} failed to add item to cart`, ToastAndroid.SHORT);
     }
   };
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         const response = await axios.get("http://10.0.2.2:5000/menu/menumeal");
         setData(response.data);
       } catch (error) {
         console.error("Error fetching meal data:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
@@ -115,6 +120,14 @@ const MenuMeal = ({ searchQuery }: MenuMealProps) => {
   const filteredData = data.filter((meal) =>
     meal.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <SpinningCircle />
+      </View>
+    );
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.cardsContainer}>
@@ -126,6 +139,12 @@ const MenuMeal = ({ searchQuery }: MenuMealProps) => {
 };
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: "50%",
+  },
   cardsContainer: {
     paddingHorizontal: 10,
     paddingTop: 10,

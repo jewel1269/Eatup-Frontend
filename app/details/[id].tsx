@@ -14,17 +14,21 @@ import {
   ToastAndroid,
 } from "react-native";
 import LottieView from "lottie-react-native";
+import SpinningCircle from "@/components/AllComponent/SpinningCircle/SpinningCircle";
+import useAuth from "@/components/AllComponent/useAuth/useAuth";
 
 const DetailsPage = () => {
   const { id } = useLocalSearchParams<any>();
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const {user}=useAuth()
 
   const [cart, setCart] = useState<any[]>([]);
 
   const addToCart = async (item: any) => {
     const cartItem = {
       id: item?._id,
+      userEmail:user.email,
       title: item.title,
       description: item.description,
       price: item.price,
@@ -80,16 +84,7 @@ const DetailsPage = () => {
 
   // Show Lottie animation loader when data is being fetched
   if (loading) {
-    return (
-      <View style={styles.loaderContainer}>
-        <LottieView
-          source={require("../../assets/loader/Loader2.json")}
-          autoPlay
-          loop
-          style={styles.lottie}
-        />
-      </View>
-    );
+    return <SpinningCircle/>
   }
 
   if (!product) {
@@ -155,11 +150,12 @@ const DetailsPage = () => {
         <Text style={styles.descriptionText}>{product.description}</Text>
 
         <Text style={styles.ingredients}>• {product.category}</Text>
+        <Text style={{fontSize:16, fontWeight:"bold", marginTop:-5}}>•Price: ${product.price.toFixed(2)}</Text>
       </View>
 
       <TouchableOpacity onPress={()=>addToCart(product)} style={styles.addToCartButton}>
         <Text style={styles.addToCartText}>
-          Add To Cart - ${product.price.toFixed(2)}
+          Add To Cart 
         </Text>
       </TouchableOpacity>
     </ScrollView>
@@ -189,7 +185,7 @@ const styles = StyleSheet.create({
   },
   productImage: {
     width: "100%",
-    height: width * 0.6, // Responsive height
+    height: width * 0.8, // Responsive height
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
   },
@@ -241,7 +237,9 @@ const styles = StyleSheet.create({
   },
   addToCartButton: {
     backgroundColor: "#FF6347",
-    paddingVertical: 16,
+    paddingVertical: 10,
+    width:"50%",
+    alignSelf:"center",
     borderRadius: 30,
     marginHorizontal: 16,
     marginBottom: 20,

@@ -1,5 +1,6 @@
+import axios from "axios";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,57 +8,128 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
-  ScrollView,
   Modal,
+  ToastAndroid,
 } from "react-native";
-import Icon from 'react-native-vector-icons/MaterialIcons'; // Import the icon library
+import Icon from "react-native-vector-icons/MaterialIcons"; // Import the icon library
+import useAuth from "../useAuth/useAuth";
+
+interface Item {
+  _id: string;
+  title: string;
+  price: number;
+  quantity: number;
+}
 
 const OrderPage = () => {
-  const [address, setAddress] = useState("");
-  const [contactNumber, setContactNumber] = useState("");
-  const [items] = useState([
-    { id: "1", name: "Burger", price: 5, quantity: 2 },
-    { id: "2", name: "Pizza", price: 8, quantity: 1 },
-  ]);
-  const [paymentMethod, setPaymentMethod] = useState("cash");
-  const [bkashModalVisible, setBkashModalVisible] = useState(false);
-  const [bkashNumber, setBkashNumber] = useState("");
-  const [bkashPin, setBkashPin] = useState("");
+  const [address, setAddress] = useState<string>("");
+  const [contactNumber, setContactNumber] = useState<string>("");
+  const [paymentMethod, setPaymentMethod] = useState<string>("cash");
+  const [bkashModalVisible, setBkashModalVisible] = useState<boolean>(false);
+  const [bkashNumber, setBkashNumber] = useState<string>("");
+  const [bkashPin, setBkashPin] = useState<string>("");
+  const { user } = useAuth();
+  const [items, setItems] = useState<Item[]>([]);
 
-  // Calculate total
+  // Fetch cart items from backend
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("http://10.0.2.2:5000/cart/meals");
+        setItems(response.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        ToastAndroid.show("Failed to fetch cart items. Please try again.", ToastAndroid.TOP);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Calculate subtotal
   const subTotal = items.reduce(
     (total, item) => total + item.price * item.quantity,
     0
   );
 
-  const handleOrder = () => {
+  // Handle order submission
+  const handleOrder = async () => {
+    if (!address || !contactNumber) {
+      ToastAndroid.show("Please fill in all fields.", ToastAndroid.TOP);
+      return;
+    }
+
     if (paymentMethod === "bkash") {
       setBkashModalVisible(true);
     } else {
-      // Handle order submission logic for cash payment
-      console.log("Order submitted (Cash):", {
+      const orderDetails = {
         address,
         contactNumber,
-        paymentMethod,
-      });
+        paymentMethod: "cash",
+        orderItems: items.map((item) => ({
+          title: item.title,
+          _id: item._id,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+        subTotal,
+        userEmail: user?.email,
+        cart:true,
+        status: "Pending",
+      };
+
+      try {
+        await axios.post("http://10.0.2.2:5000/order", orderDetails);
+        ToastAndroid.show("Order placed successfully!", ToastAndroid.TOP);
+        router.push("/allOrder");
+      } catch (error) {
+        console.error("Error placing order:", error);
+        ToastAndroid.show("Failed to place order. Please try again.", ToastAndroid.TOP);
+      }
     }
   };
 
-  const handleBkashPayment = () => {
-    console.log("Order submitted (Bkash):", {
+  // Handle Bkash payment logic
+  const handleBkashPayment = async () => {
+    if (!bkashNumber || !bkashPin) {
+      ToastAndroid.show("Please fill in Bkash details.", ToastAndroid.TOP);
+      return;
+    }
+
+    const orderDetails = {
       address,
       contactNumber,
+      paymentMethod: "bkash",
       bkashNumber,
       bkashPin,
-    });
-    // Reset fields and close modal
-    setBkashNumber("");
-    setBkashPin("");
-    setBkashModalVisible(false);
+      orderItems: items.map((item) => ({
+        title: item.title,
+        _id: item._id,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+      userEmail: user?.email,
+      status: "Pending",
+      cart:true,
+       subTotal
+    };
+
+    try {
+      await axios.post("http://10.0.2.2:5000/order", orderDetails);
+      ToastAndroid.show("Bkash payment successful, order placed!", ToastAndroid.TOP);
+      router.push("/allOrder");
+    } catch (error) {
+      console.error("Error placing order with Bkash:", error);
+      ToastAndroid.show("Failed to place order with Bkash. Please try again.", ToastAndroid.TOP);
+    } finally {
+      setBkashNumber("");
+      setBkashPin("");
+      setBkashModalVisible(false);
+    }
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.headerContainer}>
         <TouchableOpacity onPress={() => router.back()}>
           <Icon name="arrow-back" size={24} color="#000" />
@@ -86,36 +158,43 @@ const OrderPage = () => {
       <Text style={styles.sectionHeader}>Items Ordered</Text>
       <FlatList
         data={items}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
           <View style={styles.itemContainer}>
-            <Text style={styles.itemText}>
-              {item.name} x {item.quantity} - ${item.price * item.quantity}
-            </Text>
+            <Text>{item.title} - ${item.price} x {item.quantity} = ${item.price * item.quantity}</Text>
           </View>
         )}
       />
+
+      {/* Summary */}
+      <View style={styles.summaryContainer}>
+        <Text style={styles.summaryText}>Total Items: {items.length}</Text>
+        <Text style={styles.summaryText}>Subtotal: ${subTotal}</Text>
+      </View>
 
       {/* Payment Options */}
       <Text style={styles.sectionHeader}>Payment Method</Text>
       <View style={styles.paymentContainer}>
         <TouchableOpacity
-          style={paymentMethod === "bkash" ? styles.selectedPayment : styles.paymentOption}
+          style={
+            paymentMethod === "bkash"
+              ? styles.selectedPayment
+              : styles.paymentOption
+          }
           onPress={() => setPaymentMethod("bkash")}
         >
           <Text>Bkash</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={paymentMethod === "cash" ? styles.selectedPayment : styles.paymentOption}
+          style={
+            paymentMethod === "cash"
+              ? styles.selectedPayment
+              : styles.paymentOption
+          }
           onPress={() => setPaymentMethod("cash")}
         >
           <Text>Cash on Delivery</Text>
         </TouchableOpacity>
-      </View>
-
-      {/* Summary */}
-      <View style={styles.summaryContainer}>
-        <Text style={styles.summaryText}>Subtotal: ${subTotal}</Text>
       </View>
 
       {/* Order Button */}
@@ -124,11 +203,7 @@ const OrderPage = () => {
       </TouchableOpacity>
 
       {/* Bkash Payment Modal */}
-      <Modal
-        transparent={true}
-        visible={bkashModalVisible}
-        animationType="slide"
-      >
+      <Modal transparent={true} visible={bkashModalVisible} animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalHeader}>Bkash Payment</Text>
@@ -161,7 +236,7 @@ const OrderPage = () => {
           </View>
         </View>
       </Modal>
-    </ScrollView>
+    </View>
   );
 };
 
@@ -198,9 +273,6 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomWidth: 1,
     borderColor: "#ccc",
-  },
-  itemText: {
-    fontSize: 16,
   },
   paymentContainer: {
     flexDirection: "row",
@@ -259,39 +331,37 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: "80%",
-    backgroundColor: "white",
-    padding: 20,
+    backgroundColor: "#fff",
     borderRadius: 10,
-    alignItems: "center",
+    padding: 20,
   },
   modalHeader: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 20,
+    marginBottom: 15,
   },
   confirmButton: {
-    backgroundColor: "#ff4d4d",
-    paddingVertical: 10,
+    backgroundColor: "#28a745",
+    padding: 10,
     borderRadius: 8,
-    marginVertical: 10,
-    width: "100%",
     alignItems: "center",
+    marginBottom: 10,
   },
   confirmButtonText: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: 16,
+    fontWeight: "bold",
   },
   cancelButton: {
-    paddingVertical: 10,
+    backgroundColor: "#dc3545",
+    padding: 10,
     borderRadius: 8,
-    marginVertical: 10,
-    width: "100%",
     alignItems: "center",
-    backgroundColor: "#ccc",
   },
   cancelButtonText: {
-    color: "black",
-    fontSize: 18,
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
 
